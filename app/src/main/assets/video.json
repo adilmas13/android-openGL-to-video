@@ -1,0 +1,1187 @@
+{
+  "dimensions": [
+    "9:16"
+  ],
+  "template_id": 10456,
+  "headline": "This is where your Headline goes",
+  "text": "This is the spot for your text\nThis is the spot for your text\nThis is the spot for your text\nPretext will be written here, \"A quote from a spokesperson goes here\", said by Post-text will be written here.\nPretext will be written here, \"A quote from a spokesperson goes here\", said by Post-text will be written here.\nHave a question?, This is where it will appear.\nHave a question?, This is where it will appear.\n",
+  "master_video_id": 381036,
+  "step": 1,
+  "premium": [],
+  "template_name": "Start From Scratch",
+  "template_type": "story",
+  "account_id": 43058,
+  "emotion": "",
+  "video_properties": {
+    "colors": {
+      "primary": [
+        "255",
+        "255",
+        "255",
+        255
+      ],
+      "secondary": [
+        "233",
+        "204",
+        "78",
+        255
+      ],
+      "tertiary": [
+        "5",
+        "21",
+        "39",
+        255
+      ],
+      "quaternary": [
+        "0",
+        "0",
+        "0",
+        255
+      ]
+    },
+    "colors_ref": {
+      "user_flag": {
+        "primary": 0,
+        "secondary": 0,
+        "tertiary": 0,
+        "quaternary": 0
+      },
+      "colors": {
+        "primary": [
+          "255",
+          "255",
+          "255",
+          255
+        ],
+        "secondary": [
+          "233",
+          "204",
+          "78",
+          255
+        ],
+        "tertiary": [
+          "5",
+          "21",
+          "39",
+          255
+        ],
+        "quaternary": [
+          "0",
+          "0",
+          "0",
+          255
+        ]
+      }
+    },
+    "fonts": {
+      "primary": "/Muli-Bold.ttf",
+      "secondary": "/Muli-Regular.ttf",
+      "tertiary": "/Muli-Light.ttf"
+    },
+    "brand_properties": {
+      "colors": {
+        "primary": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "secondary": [
+          255,
+          3,
+          16,
+          255
+        ],
+        "tertiary": [
+          255,
+          255,
+          255,
+          255
+        ],
+        "quaternary": [
+          3,
+          255,
+          242,
+          255
+        ]
+      },
+      "fonts": {
+        "primary": "/NotoSans-Regular.ttf",
+        "secondary": "/NotoSans-Regular.ttf",
+        "tertiary": "/NotoSans-Regular.ttf"
+      }
+    },
+    "template_properties": {
+      "colors": {
+        "primary": [
+          "255",
+          "255",
+          "255",
+          255
+        ],
+        "secondary": [
+          "233",
+          "204",
+          "78",
+          255
+        ],
+        "tertiary": [
+          "5",
+          "21",
+          "39",
+          255
+        ],
+        "quaternary": [
+          "0",
+          "0",
+          "0",
+          255
+        ]
+      },
+      "fonts": {
+        "primary": "/Muli-Bold.ttf",
+        "secondary": "/Muli-Regular.ttf",
+        "tertiary": "/Muli-Light.ttf"
+      }
+    },
+    "custom_properties": {
+      "colors": {
+        "primary": [
+          "255",
+          "255",
+          "255",
+          255
+        ],
+        "secondary": [
+          "233",
+          "204",
+          "78",
+          255
+        ],
+        "tertiary": [
+          "5",
+          "21",
+          "39",
+          255
+        ],
+        "quaternary": [
+          "0",
+          "0",
+          "0",
+          255
+        ]
+      },
+      "fonts": {
+        "primary": "/Muli-Bold.ttf",
+        "secondary": "/Muli-Regular.ttf",
+        "tertiary": "/Muli-Light.ttf"
+      }
+    },
+    "applied_colors": "template"
+  },
+  "screen_size": [
+    1080,
+    1920
+  ],
+  "spans": [
+    {
+      "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52",
+      "type": "custom_block",
+      "sub_type": "Blank Canvas Vert",
+      "pretext": [],
+      "text": [],
+      "posttext": [],
+      "lock_scene": false,
+      "nouns": [],
+      "no_text": [],
+      "heading_text": [],
+      "meta": {
+        "before": false,
+        "after": false,
+        "placeholder": false,
+        "hidden": false
+      },
+      "flags": {
+        "added": false,
+        "after": null,
+        "split": false,
+        "typeChanged": true,
+        "textChanged": false,
+        "nounsChanged": false,
+        "recalculateDuration": false,
+        "generateBlock": true
+      },
+      "epic_result": {
+        "epic_combinations": [
+          {
+            "epic_combo": "",
+            "epic_content": []
+          }
+        ],
+        "global_context": {
+          "global_context_type": "",
+          "global_context_subtype": ""
+        }
+      },
+      "api_modal_input": []
+    },
+    {
+      "id": ".363f4a3e-7366-4d1f-8f57-c494780aeaa3",
+      "type": "audio",
+      "sub_type": "audio"
+    }
+  ],
+  "transitions": [],
+  "default_transition": 998,
+  "audio_url": "https://s3.ap-south-1.amazonaws.com/invideo-music/New_Music_Dec/General/Clover_3.mp3",
+  "audio_duration": 436.48,
+  "audio_params": {
+    "audio_url": "https://s3.ap-south-1.amazonaws.com/invideo-music/New_Music_Dec/General/Clover_3.mp3",
+    "bpm": "",
+    "effect_time": 1,
+    "speed_factor": 1
+  },
+  "blocks": [
+    {
+      "name": "Blank Canvas Vert",
+      "type": "custom_block",
+      "components": [
+        {
+          "name": "Clean 1",
+          "type": "composite",
+          "components": [
+            {
+              "name": "gif_video",
+              "type": "image",
+              "components": [],
+              "layout": {
+                "layer_properties": {
+                  "opacity": 1,
+                  "blend_effect": "None",
+                  "color_correction": {
+                    "type": "duotone",
+                    "color": [
+                      "5",
+                      "21",
+                      "39",
+                      "1"
+                    ],
+                    "colors_ref": {
+                      "color": {
+                        "user_flag": 1,
+                        "reference": "tertiary"
+                      },
+                      "opacity": {
+                        "user_flag": 0,
+                        "reference": 1
+                      }
+                    }
+                  },
+                  "color_overlay": "None",
+                  "drop_shadow": "None",
+                  "opacity_ref": {
+                    "user_flag": 0,
+                    "reference": 1
+                  }
+                },
+                "blur": 0,
+                "fit_type": "stretch_to_screen"
+              },
+              "duration": {
+                "split_self": 0,
+                "split_others": 0,
+                "priority": 5,
+                "delay": 0,
+                "precalculated_duration": 2,
+                "element_duration": 2,
+                "absolute_duration": 5,
+                "driver": true,
+                "start_time": 0,
+                "end_time": 1,
+                "absolute_start": 0,
+                "absolute_end": 5
+              },
+              "animation": {
+                "animation_in": "None",
+                "animation": "None",
+                "animation_out": "None"
+              },
+              "audio": {},
+              "position": {
+                "top_x": 0,
+                "bottom_x": 1,
+                "top_y": 0,
+                "bottom_y": 1,
+                "pivot_x": 0.5,
+                "pivot_y": 0.5,
+                "orientation": "horizontal"
+              },
+              "input": {
+                "type": "mandatory",
+                "allow_multiple": 0,
+                "placeholder": "Blah",
+                "hidden": 1,
+                "required": 0
+              },
+              "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.82bfddea-29d0-4946-8dbe-40d10c74d52d.b85e10c7-3513-43b0-83f3-d84a091ca7f4",
+              "url": "https://s3.ap-south-1.amazonaws.com/asset-snapshot/invideo-block-assets/Template_Block_Assets/Clean_NewStructure/overlay/Black_Layer_SD2.png",
+              "thumbnail_url": "https://s3.ap-south-1.amazonaws.com/asset-snapshot/invideo-block-assets/Template_Block_Assets/Clean_NewStructure/overlay/Black_Layer_SD2.png",
+              "metadata": {
+                "premium": false
+              },
+              "sub_type": "image_asset",
+              "orientation": "",
+              "word": "",
+              "entity_type": "",
+              "screen_edit": 1,
+              "screen_click": 0
+            }
+          ],
+          "layout": {
+            "fit_type": "self_position",
+            "overflow": "hidden",
+            "layer_properties": {
+              "opacity": 1,
+              "blend_effect": "None",
+              "color_correction": "None",
+              "color_overlay": "None",
+              "drop_shadow": "None",
+              "opacity_ref": {
+                "user_flag": 0,
+                "reference": 1
+              }
+            }
+          },
+          "duration": {
+            "split_self": 1,
+            "split_others": 0,
+            "priority": 15,
+            "delay": 0,
+            "absolute_duration": 5,
+            "driver": false,
+            "start_time": 0,
+            "end_time": 1,
+            "absolute_start": 0,
+            "absolute_end": 5
+          },
+          "animation": {
+            "animation_in": "None",
+            "animation_out": "None",
+            "animation": "None"
+          },
+          "audio": {},
+          "position": {
+            "top_x": 0,
+            "bottom_x": 1,
+            "top_y": 0,
+            "bottom_y": 1,
+            "pivot_x": 0.5,
+            "pivot_y": 0.5,
+            "orientation": "horizontal"
+          },
+          "input": {
+            "type": "mandatory",
+            "allow_multiple": 0,
+            "placeholder": "Blah",
+            "hidden": 1
+          },
+          "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.82bfddea-29d0-4946-8dbe-40d10c74d52d",
+          "table_ref": {
+            "table_id": 2,
+            "table_name": "backgrounds",
+            "ref_type": "table",
+            "tags": null,
+            "slave_category": "all",
+            "style": null
+          },
+          "template_ref": {
+            "template_placeholder": "pre_mandatory_components",
+            "ref_type": "template",
+            "ref_name": "overlay_assets"
+          },
+          "sub_type": "pre_video_asset_composite",
+          "input_list": [],
+          "screen_edit": 1,
+          "screen_click": 1,
+          "is_visible": true,
+          "is_lock": true,
+          "layer_name": "Background 1"
+        },
+        {
+          "name": "background_media_962176",
+          "type": "composite",
+          "components": [
+            {
+              "name": "background_media",
+              "type": "image",
+              "components": [],
+              "layout": {
+                "layer_properties": {
+                  "opacity": 1,
+                  "blend_effect": "None",
+                  "color_correction": "None",
+                  "color_overlay": "None",
+                  "drop_shadow": "None",
+                  "opacity_ref": {
+                    "user_flag": 0,
+                    "reference": 1
+                  },
+                  "filter": "None"
+                },
+                "fit_type": "crop_to_screen",
+                "loop": 0,
+                "resize_logic": "max_size",
+                "crop_to_shape": "None",
+                "mute": 0
+              },
+              "duration": {
+                "split_self": 1,
+                "split_others": 0,
+                "priority": 1,
+                "delay": 0,
+                "element_duration": 5,
+                "absolute_duration": 5,
+                "driver": true,
+                "start_time": 0,
+                "end_time": 1,
+                "absolute_start": 0,
+                "absolute_end": 5,
+                "minimum_duration": 5
+              },
+              "animation": {
+                "animation_in": "None",
+                "animation": "None",
+                "animation_out": "None",
+                "animation_in_parameters": {
+                  "type": "whole"
+                },
+                "animation_out_parameters": {
+                  "type": "whole"
+                }
+              },
+              "audio": {},
+              "position": {
+                "top_x": 0,
+                "bottom_x": 1,
+                "top_y": 0,
+                "bottom_y": 1,
+                "pivot_x": 0.5,
+                "pivot_y": 0.5,
+                "orientation": "horizontal"
+              },
+              "input": {
+                "type": "media_input",
+                "allow_multiple": 1,
+                "placeholder": "None",
+                "hidden": 1,
+                "required": 1,
+                "key": "url",
+                "value": "default_image.png"
+              },
+              "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.3abeb172-6c66-97df-cf0e-220346388042.842c02d4-9dd6-550f-828f-f05c352c7b77",
+              "url": "https://invideo-uploads-ap-south-1.s3.ap-south-1.amazonaws.com/SunnyLeone1573098997720.jpg",
+              "metadata": {
+                "premium": false
+              },
+              "sub_type": "bg_image",
+              "orientation": "",
+              "word": "",
+              "entity_type": "",
+              "screen_edit": 1,
+              "screen_click": 0,
+              "sticker_id": "",
+              "media_properties": {
+                "width": 1822,
+                "height": 2359,
+                "url": "https://invideo-uploads-ap-south-1.s3.ap-south-1.amazonaws.com/SunnyLeone1573098997720.jpg",
+                "word": "",
+                "image_link": "https://invideo-uploads-ap-south-1.s3.ap-south-1.amazonaws.com/SunnyLeone1573098997720.jpg",
+                "thumbnail_url": "https://d1c7ic18uy0m4b.cloudfront.net/480x480/SunnyLeone1573098997720.jpg",
+                "source": "",
+                "search_license": "",
+                "partner_image_id": "",
+                "possible_animations": [
+                  "pan_to_left",
+                  "pan_to_right"
+                ]
+              },
+              "thumbnail_url": "https://d1c7ic18uy0m4b.cloudfront.net/480x480/SunnyLeone1573098997720.jpg",
+              "media_type": "image"
+            }
+          ],
+          "layout": {
+            "fit_type": "self_position",
+            "overflow": "hidden",
+            "layer_properties": {
+              "opacity": 1,
+              "blend_effect": "None",
+              "color_correction": "None",
+              "color_overlay": "None",
+              "drop_shadow": {
+                "enabled": true,
+                "name": "None",
+                "distance": 0,
+                "blur": 0,
+                "opacity": 0,
+                "angle": 0,
+                "drop_shadow_color": [
+                  0,
+                  0,
+                  0,
+                  255
+                ],
+                "colors_ref": {
+                  "drop_shadow_color": {
+                    "user_flag": 0,
+                    "reference": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ]
+                  }
+                },
+                "shadow_factor": 275
+              },
+              "opacity_ref": {
+                "user_flag": 0,
+                "reference": 1
+              }
+            }
+          },
+          "duration": {
+            "split_self": 1,
+            "split_others": 0,
+            "priority": 3,
+            "delay": 0,
+            "absolute_duration": 5,
+            "driver": true,
+            "start_time": 0,
+            "end_time": 1,
+            "absolute_start": 0,
+            "absolute_end": 5
+          },
+          "animation": {
+            "animation_in": "None",
+            "animation_out": "None",
+            "animation": "None",
+            "animation_in_parameters": {
+              "type": "whole",
+              "in_effect_factor": 1
+            },
+            "animation_out_parameters": {
+              "type": "whole"
+            }
+          },
+          "audio": {},
+          "position": {
+            "top_x": 0,
+            "bottom_x": 1,
+            "top_y": 0,
+            "bottom_y": 1,
+            "pivot_x": 0.5,
+            "pivot_y": 0.5,
+            "orientation": "horizontal"
+          },
+          "input": {
+            "type": "mandatory",
+            "allow_multiple": 1,
+            "placeholder": "Image Here",
+            "hidden": 1,
+            "required": 1
+          },
+          "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.3abeb172-6c66-97df-cf0e-220346388042",
+          "sub_type": "bg_media_composite",
+          "is_visible": true,
+          "is_lock": false,
+          "layer_name": "Media 1 (Image)",
+          "screen_edit": 1,
+          "screen_click": 1,
+          "sr_no": 0
+        },
+        {
+          "name": "Add a headline",
+          "type": "composite",
+          "components": [
+            {
+              "name": "box_asset_1",
+              "type": "image",
+              "components": [],
+              "layout": {
+                "layer_properties": {
+                  "opacity": 0.001,
+                  "blend_effect": "None",
+                  "color_correction": {
+                    "type": "duotone",
+                    "color": [
+                      "5",
+                      "21",
+                      "39",
+                      255
+                    ],
+                    "colors_ref": {
+                      "color": {
+                        "user_flag": 0,
+                        "reference": "tertiary"
+                      },
+                      "opacity": {
+                        "user_flag": 0,
+                        "reference": 0.001
+                      }
+                    }
+                  },
+                  "color_overlay": "None",
+                  "drop_shadow": "None",
+                  "opacity_ref": {
+                    "user_flag": 0,
+                    "reference": 0.001
+                  }
+                },
+                "fit_type": "stretch_to_screen",
+                "loop": 0,
+                "resize_logic": "max_size",
+                "playback_type": "speed_factor",
+                "playback_rate": 1
+              },
+              "duration": {
+                "split_self": 0,
+                "split_others": 0,
+                "priority": 5,
+                "delay": 0,
+                "element_duration": 5,
+                "absolute_duration": 5,
+                "driver": false,
+                "start_time": 0,
+                "end_time": 1,
+                "absolute_start": 0,
+                "absolute_end": 5,
+                "minimum_duration": 5
+              },
+              "animation": {
+                "animation_in": "None",
+                "animation": "None",
+                "animation_out": "None"
+              },
+              "audio": {},
+              "position": {
+                "top_x": 0,
+                "bottom_x": 1,
+                "top_y": 0,
+                "bottom_y": 1,
+                "pivot_x": 0.5,
+                "pivot_y": 0.5,
+                "orientation": "horizontal"
+              },
+              "input": {
+                "type": "mandatory",
+                "allow_multiple": 0,
+                "placeholder": "Blah",
+                "hidden": 1,
+                "required": 1
+              },
+              "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.d1634564-6a1f-9714-d4a4-d64cccc86730.7520de68-aee3-1362-349c-e19826dc6352",
+              "url": "https://s3.ap-south-1.amazonaws.com/asset-snapshot/invideo-block-assets/Template_Block_Assets/New_Structure/LeftPanel_TextBox/boxAsset1_SD1.png",
+              "metadata": {
+                "premium": false
+              },
+              "sub_type": "image_asset",
+              "orientation": "",
+              "word": "",
+              "entity_type": "",
+              "screen_edit": 1,
+              "screen_click": 0
+            },
+            {
+              "name": "text",
+              "type": "text",
+              "components": [],
+              "layout": {
+                "xpad": 0.05,
+                "ypad": 0.05,
+                "max_font_factor": 0.05,
+                "main_font": {
+                  "background_color": [
+                    "5",
+                    "21",
+                    "39",
+                    255
+                  ],
+                  "foreground_color": [
+                    "208",
+                    "17",
+                    "17",
+                    255
+                  ],
+                  "font_style": "/Muli-Bold.ttf",
+                  "colors_ref": {
+                    "background_color": {
+                      "user_flag": 0,
+                      "reference": "tertiary"
+                    },
+                    "foreground_color": {
+                      "user_flag": 1,
+                      "reference": "primary"
+                    },
+                    "band_opacity": {
+                      "user_flag": 0,
+                      "reference": 0
+                    }
+                  }
+                },
+                "highlight_font": {
+                  "background_color": [
+                    "5",
+                    "21",
+                    "39",
+                    255
+                  ],
+                  "foreground_color": [
+                    "233",
+                    "204",
+                    "78",
+                    255
+                  ],
+                  "font_style": "/Muli-Bold.ttf",
+                  "highlight_type": "word",
+                  "colors_ref": {
+                    "background_color": {
+                      "user_flag": 0,
+                      "reference": "tertiary"
+                    },
+                    "foreground_color": {
+                      "user_flag": 0,
+                      "reference": "secondary"
+                    }
+                  }
+                },
+                "horizontal_text_alignment": "center",
+                "vertical_text_alignment": "center",
+                "band_opacity": 0,
+                "layer_properties": {
+                  "opacity": 1,
+                  "blend_effect": "None",
+                  "color_correction": "None",
+                  "color_overlay": "None",
+                  "drop_shadow": {
+                    "enabled": true,
+                    "name": "None",
+                    "distance": 0,
+                    "blur": 0,
+                    "opacity": 0,
+                    "angle": 0,
+                    "drop_shadow_color": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ],
+                    "colors_ref": {
+                      "drop_shadow_color": {
+                        "user_flag": 0,
+                        "reference": [
+                          0,
+                          0,
+                          0,
+                          255
+                        ]
+                      }
+                    }
+                  },
+                  "opacity_ref": {
+                    "user_flag": 0,
+                    "reference": 1
+                  }
+                },
+                "fit_type": "self_position",
+                "resize_logic": "max_size",
+                "font_spec": [],
+                "lineHeight": "1.4",
+                "text_transform": "default",
+                "font_size": 80,
+                "fixed": true
+              },
+              "duration": {
+                "seconds_per_character": 0.06,
+                "minimum_duration": 5,
+                "delay": 0,
+                "split_self": 1,
+                "split_others": 0,
+                "priority": 2,
+                "absolute_duration": 5,
+                "element_duration": 5,
+                "driver": true,
+                "start_time": 0,
+                "end_time": 1,
+                "absolute_start": 0,
+                "absolute_end": 5
+              },
+              "animation": {
+                "animation_in": "fadeInLeft",
+                "animation": "None",
+                "animation_out": "fadeOutRight",
+                "animation_in_parameters": {
+                  "type": "whole",
+                  "in_effect_factor": 1,
+                  "effect_time": 0.2
+                },
+                "animation_out_parameters": {
+                  "type": "whole",
+                  "out_effect_factor": 1,
+                  "effect_time": 0.2
+                }
+              },
+              "audio": {},
+              "position": {
+                "top_x": 0,
+                "bottom_x": 1,
+                "top_y": 0,
+                "bottom_y": 1,
+                "pivot_x": 0.5,
+                "pivot_y": 0.5,
+                "orientation": "horizontal"
+              },
+              "input": {
+                "type": "text_input",
+                "key": "text",
+                "value": "",
+                "allow_multiple": 1,
+                "required": 1,
+                "placeholder": "Enter your text here",
+                "hidden": 0,
+                "component_config": "{\"possible_types\": \"text\", \"layout\": {\"xpad\": 0.05, \"ypad\": 0.05, \"max_font_factor\": 0.05, \"main_font\": {\"foreground_color\": \"primary\", \"font_style\": \"primary\"}, \"highlight_font\": {\"foreground_color\": \"secondary\", \"font_style\": \"primary\"}, \"horizontal_text_alignment\": \"center\", \"layer_properties\": {\"drop_shadow\": \"None\"}}, \"duration\": {\"delay\": 0}, \"animation\": {\"animation_in\": \"None\"}, \"text\": \"Text placeholder\"}"
+              },
+              "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.d1634564-6a1f-9714-d4a4-d64cccc86730.dcbe2f61-06e5-adfe-ab34-0125b1d34e1a",
+              "text": "Sunny Jaisi koi nahein",
+              "highlighted_text": "Sunny Jaisi koi nahein",
+              "highlighted_strings": [],
+              "sub_type": "text",
+              "initial_highlighted_text": "Sunny Jaisi koi nahein",
+              "screen_edit": 1,
+              "screen_click": 0
+            }
+          ],
+          "layout": {
+            "fit_type": "self_position",
+            "overflow": "hidden",
+            "layer_properties": {
+              "opacity": 1,
+              "blend_effect": "None",
+              "color_correction": "None",
+              "color_overlay": "None",
+              "drop_shadow": {
+                "enabled": true,
+                "name": "None",
+                "distance": 0,
+                "blur": 0,
+                "opacity": 0,
+                "angle": 0,
+                "drop_shadow_color": [
+                  0,
+                  0,
+                  0,
+                  255
+                ],
+                "colors_ref": {
+                  "drop_shadow_color": {
+                    "user_flag": 0,
+                    "reference": [
+                      0,
+                      0,
+                      0,
+                      255
+                    ]
+                  }
+                },
+                "shadow_factor": 113.1025641025641
+              },
+              "opacity_ref": {
+                "user_flag": 0,
+                "reference": 1
+              }
+            }
+          },
+          "duration": {
+            "split_self": 0,
+            "split_others": 0,
+            "priority": 20,
+            "delay": 0.5,
+            "absolute_duration": 5,
+            "driver": false,
+            "start_time": 0,
+            "end_time": 1,
+            "absolute_start": 0,
+            "absolute_end": 5,
+            "fixed_start_time": 0,
+            "fixed_end_time": 1
+          },
+          "animation": {
+            "animation_in": "None",
+            "animation_out": "None",
+            "animation": "None",
+            "animation_in_parameters": {
+              "type": "whole",
+              "effect_time": 0.2222222222222222,
+              "in_effect_factor": 1
+            },
+            "animation_out_parameters": {
+              "type": "whole"
+            }
+          },
+          "audio": {},
+          "position": {
+            "top_x": 0.10541310541310542,
+            "bottom_x": 0.8945868945868947,
+            "top_y": 0.40064102564102566,
+            "bottom_y": 0.5993589743589743,
+            "pivot_x": 0.5,
+            "pivot_y": 0,
+            "orientation": "horizontal",
+            "vertical_text_alignment": "center",
+            "horizontal_text_alignment": "center"
+          },
+          "input": {
+            "type": "mandatory",
+            "allow_multiple": 0,
+            "placeholder": "Blah",
+            "hidden": 0,
+            "required": 1
+          },
+          "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52.d1634564-6a1f-9714-d4a4-d64cccc86730",
+          "sub_type": "text_composite",
+          "is_visible": true,
+          "is_lock": false,
+          "layer_name": "Sunny Jaisi koi nahein",
+          "input_list": [
+            {
+              "id": ".2175b556-d352-4178-831c-36aa49409b94.367f5f15-cdcf-425c-8e80-c0e686be1b41",
+              "parent_id": ".2175b556-d352-4178-831c-36aa49409b94",
+              "name": "text",
+              "input": {
+                "type": "text_input",
+                "key": "text",
+                "value": "",
+                "allow_multiple": 1,
+                "required": 1,
+                "placeholder": "Enter your text here",
+                "hidden": 0
+              },
+              "input_type": "text_input",
+              "input_options": [],
+              "sub_type": "",
+              "component_type": "text",
+              "values": [
+                "Text placeholder"
+              ]
+            }
+          ],
+          "left_panel": true,
+          "original_position": {
+            "top_x": 0.2,
+            "bottom_x": 0.8,
+            "top_y": 0.4,
+            "bottom_y": 0.6,
+            "pivot_x": 0.5,
+            "pivot_y": 0,
+            "vertical_text_alignment": "center",
+            "horizontal_text_alignment": "center",
+            "orientation": "horizontal"
+          },
+          "screen_edit": 1,
+          "screen_click": 1
+        }
+      ],
+      "layout": {
+        "layer_properties": {
+          "opacity": 1,
+          "blend_effect": "None",
+          "color_correction": "None",
+          "color_overlay": "None",
+          "drop_shadow": "None",
+          "opacity_ref": {
+            "user_flag": 0,
+            "reference": 1
+          }
+        },
+        "fit_type": "self_position",
+        "overflow": "hidden"
+      },
+      "duration": {
+        "split_self": 1,
+        "split_others": 1,
+        "priority": 1,
+        "delay": 0,
+        "absolute_duration": 5,
+        "driver": true,
+        "start_time": 0,
+        "end_time": 1,
+        "absolute_start": 0,
+        "absolute_end": 5,
+        "block_minimum_duration": 2.5
+      },
+      "animation": {
+        "animation_in": "None",
+        "animation": "None",
+        "animation_out": "None",
+        "animation_in_parameters": {
+          "in_effect_factor": 1,
+          "effect_time": 0.18181818181818182,
+          "type": "whole"
+        },
+        "animation_out_parameters": {
+          "out_effect_factor": 1,
+          "effect_time": 0.1,
+          "type": "whole"
+        }
+      },
+      "position": {
+        "orientation": "horizontal",
+        "top_x": 0,
+        "bottom_x": 1,
+        "top_y": 0,
+        "bottom_y": 1,
+        "pivot_x": 0.5,
+        "pivot_y": 0.5
+      },
+      "id": ".c2b5590d-0b20-4322-a835-ad5ef83fec52",
+      "sub_type": "Blank Canvas Vert",
+      "screen_edit": 0,
+      "screen_click": 0,
+      "block_id": 111807,
+      "input_list": [],
+      "nouns": [],
+      "epic_result": {
+        "epic_combinations": [
+          {
+            "epic_combo": "",
+            "epic_content": []
+          }
+        ],
+        "global_context": {
+          "global_context_type": "",
+          "global_context_subtype": ""
+        }
+      },
+      "audio_params": {
+        "audio_url": "https://s3.ap-south-1.amazonaws.com/invideo-music/Youtube_Music_10_04_2019/General/Search_and_Rescue.mp3",
+        "bpm": "",
+        "effect_time": 1,
+        "speed_factor": 1
+      },
+      "keep_logo": true,
+      "screen_size": [
+        1080,
+        1920
+      ],
+      "block_type": "video_json",
+      "block_preference": null,
+      "edits": -13
+    },
+    {
+      "name": "background_music",
+      "type": "audio",
+      "components": [],
+      "layout": {
+        "layer_properties": {
+          "opacity": 1,
+          "blend_effect": "None",
+          "color_correction": "None",
+          "color_overlay": "None",
+          "drop_shadow": {
+            "enabled": "true",
+            "distance": 0,
+            "angle": 0,
+            "blur": 0,
+            "name": "None",
+            "opacity": 0,
+            "drop_shadow_color": [
+              0,
+              0,
+              0,
+              255
+            ],
+            "colors_ref": {
+              "drop_shadow_color": {
+                "user_flag": 0,
+                "reference": [
+                  0,
+                  0,
+                  0,
+                  255
+                ]
+              }
+            }
+          },
+          "opacity_ref": {
+            "user_flag": 0,
+            "reference": 1
+          }
+        },
+        "fit_type": "fit_with_blur"
+      },
+      "duration": {
+        "split_self": 1,
+        "split_others": 0,
+        "priority": 5,
+        "delay": 0,
+        "absolute_duration": 5,
+        "element_duration": 436.48,
+        "driver": false,
+        "start_time": 0,
+        "end_time": 1,
+        "absolute_start": 0,
+        "absolute_end": 5
+      },
+      "animation": {
+        "animation_in": "None",
+        "animation": "None",
+        "animation_out": "None"
+      },
+      "audio": {
+        "url": "https://s3.ap-south-1.amazonaws.com/invideo-music/New_Music_Dec/General/Clover_3.mp3",
+        "loop": 1,
+        "audio_volume": 0.7,
+        "playback_rate": 1,
+        "audio_priority": 5,
+        "standalone": 1,
+        "bg_volume": 0.1,
+        "end_fade_out_time": 3,
+        "audio_list": [
+          {
+            "absolute_start": 0,
+            "absolute_end": 5,
+            "audio_volume": 0.7,
+            "start_time": 0,
+            "end_time": 1
+          }
+        ]
+      },
+      "position": {
+        "orientation": "horizontal"
+      },
+      "input": {
+        "type": "mandatory",
+        "allow_multiple": 0,
+        "placeholder": "Blah",
+        "hidden": 1,
+        "required": 0
+      },
+      "id": ".363f4a3e-7366-4d1f-8f57-c494780aeaa3",
+      "sub_type": "audio",
+      "url": "https://s3.ap-south-1.amazonaws.com/invideo-music/New_Music_Dec/General/Clover_3.mp3",
+      "sr_no": 0,
+      "screen_edit": 0,
+      "screen_click": 0
+    }
+  ],
+  "duration": {
+    "absolute_duration": 5,
+    "start_time": 0,
+    "absolute_start": 0,
+    "end_time": 1,
+    "absolute_end": 5
+  },
+  "screen_edit": 1,
+  "screen_click": 1,
+  "no_watermark": true,
+  "editor_preview": "no"
+}
