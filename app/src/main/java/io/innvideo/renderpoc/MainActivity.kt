@@ -88,5 +88,6 @@ class MainActivity : AppCompatActivity() {
     private fun setViewPosition(position: Position, view: View) {
         view.top = position.top_x.toInt()
         view.bottom = position.bottom_x.toInt()
+        //dummy
     }
 }
