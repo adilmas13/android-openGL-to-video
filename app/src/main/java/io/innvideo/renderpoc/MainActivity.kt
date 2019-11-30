@@ -1,20 +1,16 @@
 package io.innvideo.renderpoc
 
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment.DIRECTORY_MOVIES
-import android.os.Environment.getExternalStoragePublicDirectory
-import android.os.Environment.getExternalStorageState
-import android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toFile
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
 import nl.bravobit.ffmpeg.FFmpeg
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,9 +31,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startFFmpeg() {
-        var videoOne = "android.resource://" + packageName + "/" + R.raw.test_video_one
-        var videoTwo = "android.resource://" + packageName + "/" + R.raw.test_video_two
-        var outputFile = getOutputMediaFile(MEDIA_TYPE_VIDEO)
+        var videoOne = copyInputStreamToFile(
+            resources.openRawResource(R.raw.test_video_one),
+            getOutputMediaFile("video_one")!!
+        ).absolutePath
+        var videoTwo = copyInputStreamToFile(
+            resources.openRawResource(R.raw.test_video_two),
+            getOutputMediaFile("video_two")!!
+        ).absolutePath
+        var outputFile = getOutputMediaFile("output").toString()
 
         val command = arrayOf(
             "-y",
@@ -65,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             "4",
             "-preset",
             "ultrafast",
-            outputFile!!.toFile().toString()
+            outputFile.toString()
         )
 
         val ffmpeg = FFmpeg.getInstance(this)
@@ -91,42 +93,49 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getOutputMediaFile(type: Int): Uri? {
+    private fun getOutputMediaFile(fileName: String): File? {
         // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        val mediaStorageDir = File(getExternalFilesDir(null)!!.absolutePath)
 
-        if (getExternalStorageState() != null) {
-            // this works for Android 2.2 and above
-            val mediaStorageDir = File(
-                getExternalStoragePublicDirectory(DIRECTORY_MOVIES),
-                "SMW_VIDEO"
-            )
-
-            // This location works best if you want the created images to be shared
-            // between applications and persist after your app has been uninstalled.
-
-            // Create the storage directory if it does not exist
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdirs()) {
-                    Log.d("ffmpeg", "failed to create directory")
-                    return null
-                }
-            }
-
-            // Create a media file name
-            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-            val mediaFile: File
-            if (type == MEDIA_TYPE_VIDEO) {
-                mediaFile = File(
-                    mediaStorageDir.getPath() + File.separator +
-                            "VID_" + timeStamp + ".mp4"
-                )
-            } else {
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
                 return null
             }
-
-            return Uri.fromFile(mediaFile)
         }
 
-        return null
+        // Create a media file name
+        val mediaFile: File
+        mediaFile = File(mediaStorageDir.path + File.separator + fileName)
+        return mediaFile
+    }
+
+    private fun copyInputStreamToFile(input: InputStream, file: File): File {
+        var out: OutputStream? = null
+
+        try {
+            out = FileOutputStream(file)
+            val buf = ByteArray(1024)
+            var len: Int = 0
+            while ((len == input.read(buf))) {
+                out!!.write(buf, 0, len)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            // Ensure that the InputStreams are closed even if there's an exception.
+            try {
+                if (out != null) {
+                    out!!.close()
+                }
+
+                // If you want to close the "in" InputStream yourself then remove this
+                // from here but ensure that you close it yourself eventually.
+                input.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            return file
+        }
     }
 }
