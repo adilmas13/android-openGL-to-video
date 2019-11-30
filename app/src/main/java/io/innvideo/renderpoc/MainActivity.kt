@@ -1,12 +1,15 @@
 package io.innvideo.renderpoc
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
 import nl.bravobit.ffmpeg.FFmpeg
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -14,6 +17,13 @@ import java.io.OutputStream
 
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        private const val folderName = "RenderPOC"
+        private const val FILE1_NAME = "test.mp4"
+        private const val FILE2_NAME = "test2.mp4"
+        private const val OUTPUT_NAME = "output.mp4"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,23 +34,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun fetchIsFFmpegSupported() {
         if (FFmpeg.getInstance(this).isSupported) {
-            startFFmpeg()
+            copyFilesFromRawToStorage()
+            //  startFFmpeg()
         } else {
             Log.e("FFMPEG", "FF MPeg is not supported")
         }
     }
 
-    private fun startFFmpeg() {
-        var videoOne = copyInputStreamToFile(
+    private fun copyFilesFromRawToStorage() {
+        createDirectoryIfNotExisting {
+            copyFileToExternalStorage(R.raw.test_video_one, FILE1_NAME)
+            copyFileToExternalStorage(R.raw.test_video_two, FILE2_NAME)
+            startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
+        }
+    }
+
+    private fun getFilePath(fileName: String) =
+        File("${getAppFolderPath()}${fileName}").absolutePath
+
+    private fun getAppFolderPath() = "${Environment.getExternalStorageDirectory()}/${folderName}/"
+
+    private fun startFFmpeg(videoOne: String, videoTwo: String) {
+      /*  var videoOne = copyInputStreamToFile(
             resources.openRawResource(R.raw.test_video_one),
             getOutputMediaFile("video_one")!!
         ).absolutePath
         var videoTwo = copyInputStreamToFile(
             resources.openRawResource(R.raw.test_video_two),
             getOutputMediaFile("video_two")!!
-        ).absolutePath
-        var outputFile = getOutputMediaFile("output").toString()
-
+        ).absolutePath*/
+//        var outputFile = getOutputMediaFile("output").toString()
+        var outputFile = "${getAppFolderPath()}${OUTPUT_NAME}"
         val command = arrayOf(
             "-y",
             "-i",
@@ -69,27 +93,84 @@ class MainActivity : AppCompatActivity() {
             "ultrafast",
             outputFile.toString()
         )
-
+        val TAG = "VIDEO_STITCHING"
         val ffmpeg = FFmpeg.getInstance(this)
+        var hasError = false
         try {
             // to execute "ffmpeg -version" command you just need to pass "-version"
             ffmpeg.execute(command, object : ExecuteBinaryResponseHandler() {
 
-                override fun onStart() {}
-
-                override fun onProgress(message: String?) {}
-
-                override fun onFailure(message: String?) {}
-
-                override fun onSuccess(message: String?) {
-                    Log.e("", "message --->$message")
+                override fun onStart() {
+                    showToast("VIDEO STITCHING STARTED")
                 }
 
-                override fun onFinish() {}
+                override fun onProgress(message: String?) {
+                    Log.d(TAG, "Progress --->$message")
+                    showToast("PROGRESS $message")
+                }
+
+                override fun onFailure(message: String?) {
+                    Log.e(TAG, message ?: "Something went wrong")
+                    showToast("VIDEO FAILED => $message")
+                    hasError = true
+                }
+
+                override fun onSuccess(message: String?) {
+                    Log.d(TAG, "VIDEO STITCHED SUCCESSFULLY --->$message")
+                    showToast("VIDEO STITCHED SUCCESSFULLY")
+                }
+
+                override fun onFinish() {
+                    showToast("VIDEO STITCHED COMPLETED ${
+                    if (hasError) "WITH ERRORS" else "" 
+                    }")
+                }
 
             })
         } catch (e: FFmpegCommandAlreadyRunningException) {
+            showToast("FFMPEG ALREADY RUNNING")
             // Handle if FFmpeg is already running
+        }
+    }
+
+    private fun showToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+
+    private fun createDirectoryIfNotExisting(callback: () -> Unit) {
+        try {
+            val f = File(Environment.getExternalStorageDirectory(), folderName)
+            if (!f.exists()) {
+                f.mkdirs()
+            }
+            callback()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error in folder creation", Toast.LENGTH_LONG).show()
+            e.printStackTrace()
+        }
+    }
+
+    private fun copyFileToExternalStorage(
+        resourceId: Int,
+        resourceName: String
+    ) {
+        val pathSDCard = "${getAppFolderPath()}${resourceName}"
+        try {
+            val `in` = resources.openRawResource(resourceId)
+            var out: FileOutputStream? = null
+            out = FileOutputStream(pathSDCard)
+            val buff = ByteArray(1024)
+            var read = 0
+            try {
+                while (`in`.read(buff).also { read = it } > 0) {
+                    out.write(buff, 0, read)
+                }
+            } finally {
+                `in`.close()
+                out.close()
+            }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
