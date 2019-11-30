@@ -8,12 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
 import nl.bravobit.ffmpeg.FFmpeg
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
+import java.io.BufferedWriter
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.io.OutputStreamWriter
+import java.io.Writer
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,17 +58,28 @@ class MainActivity : AppCompatActivity() {
     private fun getAppFolderPath() = "${Environment.getExternalStorageDirectory()}/${folderName}/"
 
     private fun startFFmpeg(videoOne: String, videoTwo: String) {
-      /*  var videoOne = copyInputStreamToFile(
-            resources.openRawResource(R.raw.test_video_one),
-            getOutputMediaFile("video_one.mp4")!!
-        ).absolutePath
-        var videoTwo = copyInputStreamToFile(
-            resources.openRawResource(R.raw.test_video_two),
-            getOutputMediaFile("video_two")!!
-        ).absolutePath*/
+        /*  var videoOne = copyInputStreamToFile(
+              resources.openRawResource(R.raw.test_video_one),
+              getOutputMediaFile("video_one.mp4")!!
+          ).absolutePath
+          var videoTwo = copyInputStreamToFile(
+              resources.openRawResource(R.raw.test_video_two),
+              getOutputMediaFile("video_two")!!
+          ).absolutePath*/
 //        var outputFile = getOutputMediaFile("output").toString()
-
+        val list = generateList(arrayOf(videoOne, videoTwo))
         var outputFile = "${getAppFolderPath()}${OUTPUT_NAME}"
+        val command1 = arrayOf(
+            "-f",
+            "concat",
+            "-safe",
+            "0",
+            "-i",
+            list,
+            "-c",
+            "copy",
+            outputFile
+        )
         val command = arrayOf(
             "-y",
             "-i",
@@ -99,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         var hasError = false
         try {
             // to execute "ffmpeg -version" command you just need to pass "-version"
-            ffmpeg.execute(command, object : ExecuteBinaryResponseHandler() {
+            ffmpeg.execute(command1, object : ExecuteBinaryResponseHandler() {
 
                 override fun onStart() {
                     showToast("VIDEO STITCHING STARTED")
@@ -122,9 +136,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFinish() {
-                    showToast("VIDEO STITCHED COMPLETED ${
-                    if (hasError) "WITH ERRORS" else "" 
-                    }")
+                    showToast(
+                        "VIDEO STITCHED COMPLETED ${
+                        if (hasError) "WITH ERRORS" else ""
+                        }"
+                    )
                 }
 
             })
@@ -132,6 +148,33 @@ class MainActivity : AppCompatActivity() {
             showToast("FFMPEG ALREADY RUNNING")
             // Handle if FFmpeg is already running
         }
+    }
+
+    private fun generateList(inputs: Array<String>): String? {
+        val list: File
+        var writer: Writer? = null
+        try {
+            list = File(getAppFolderPath() + "ffmpeg-list.txt")
+            writer = BufferedWriter(OutputStreamWriter(FileOutputStream(list)))
+            for (input in inputs) {
+                writer.write("file '$input'\n")
+                Log.d(
+                    "test",
+                    "Writing to list file: file '$input'"
+                )
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return "/"
+        } finally {
+            try {
+                if (writer != null) writer.close()
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+        }
+        Log.d("test", "Wrote list file to " + list.absolutePath)
+        return list.absolutePath
     }
 
     private fun showToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
