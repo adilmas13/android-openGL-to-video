@@ -33,13 +33,13 @@ class MainActivity : AppCompatActivity() {
     private fun startFFmpeg() {
         var videoOne = copyInputStreamToFile(
             resources.openRawResource(R.raw.test_video_one),
-            getOutputMediaFile("video_one")!!
+            getOutputMediaFile("video_one.mp4")!!
         ).absolutePath
         var videoTwo = copyInputStreamToFile(
             resources.openRawResource(R.raw.test_video_two),
-            getOutputMediaFile("video_two")!!
+            getOutputMediaFile("video_two.mp4")!!
         ).absolutePath
-        var outputFile = getOutputMediaFile("output").toString()
+        var outputFile = getOutputMediaFile("output.mp4").toString()
 
         val command = arrayOf(
             "-y",
