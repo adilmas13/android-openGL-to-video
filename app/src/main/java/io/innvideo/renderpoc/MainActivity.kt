@@ -9,6 +9,7 @@ import android.os.Environment
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.getXTranslationBasedOnStartEndVal
@@ -52,6 +53,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initViews()
         start()
+       // startNewFFMpeg()
+    }
+
+    private fun startNewFFMpeg() {
+        copyFilesFromRawToStorage()
+       /* val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
+        val pipe1 = Config.registerNewFFmpegPipe(this)
+        val ffmpegCommand =
+            "-y -f rawvideo -pix_fmt argb -i $pipe1 -c:v libx264 -r 25 $outputFilePath"*/
     }
 
     private fun start() {
@@ -74,6 +84,28 @@ class MainActivity : AppCompatActivity() {
         fetchIsFFmpegSupported()
         setScreenWidth()
         animateText()
+        seekbar.apply {
+            max = DURATION
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    Log.d("PROGRESS => ", progress.toString())
+                    if (progress > 0) {
+                        timeline.currentPlayTime = progress.toLong()
+                    }
+                }
+
+            })
+        }
     }
 
     private fun setScreenWidth() {
@@ -104,10 +136,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun fetchIsFFmpegSupported() {
         if (FFmpeg.getInstance(this).isSupported) {
-            copyFilesFromRawToStorage()
             //  startFFmpeg()
         } else {
             Log.e("FFMPEG", "FF MPeg is not supported")
@@ -118,7 +148,8 @@ class MainActivity : AppCompatActivity() {
         createDirectoryIfNotExisting {
             copyFileToExternalStorage(R.raw.test_video_one, FILE1_NAME)
             copyFileToExternalStorage(R.raw.test_video_two, FILE2_NAME)
-            startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
+            startNewFFMpeg()
+          //  startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
         }
     }
 
