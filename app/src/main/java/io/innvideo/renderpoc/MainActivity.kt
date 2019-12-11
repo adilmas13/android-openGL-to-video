@@ -63,14 +63,15 @@ class MainActivity : AppCompatActivity() {
         val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
         val pipe1 = Config.registerNewFFmpegPipe(this)
         val ffmpegCommand =
-            "-y -f rawvideo -pix_fmt argb -i $pipe1 -c:v libx264 -r 25 $outputFilePath"
+            "-y -f rawvideo -pix_fmt argb -s 1080x1920 -i $pipe1 -c:v libx264 -r 25 $outputFilePath"
         com.arthenica.mobileffmpeg.FFmpeg.execute(ffmpegCommand)
         val bytes = ""
         val appendCommand = arrayOf("sh", "-c", "cat $bytes > $pipe1")
         Runtime.getRuntime().exec(appendCommand)
+        Config.closeFFmpegPipe(ffmpegCommand)
     }
 
-    private fun getBitmap(bitmap:Bitmap) : Int{
+    private fun getBitmap(bitmap: Bitmap): Int {
         return 0
     }
 
