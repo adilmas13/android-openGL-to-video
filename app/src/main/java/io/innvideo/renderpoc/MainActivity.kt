@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Environment
 import android.util.DisplayMetrics
@@ -12,6 +13,7 @@ import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.arthenica.mobileffmpeg.Config
 import io.innvideo.renderpoc.utils.getXTranslationBasedOnStartEndVal
 import kotlinx.android.synthetic.main.activity_main.*
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
@@ -53,20 +55,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initViews()
         start()
-       // startNewFFMpeg()
+        // startNewFFMpeg()
     }
 
     private fun startNewFFMpeg() {
         copyFilesFromRawToStorage()
-       /* val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
+        val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
         val pipe1 = Config.registerNewFFmpegPipe(this)
         val ffmpegCommand =
-            "-y -f rawvideo -pix_fmt argb -i $pipe1 -c:v libx264 -r 25 $outputFilePath"*/
+            "-y -f rawvideo -pix_fmt argb -i $pipe1 -c:v libx264 -r 25 $outputFilePath"
+        com.arthenica.mobileffmpeg.FFmpeg.execute(ffmpegCommand)
+        val bytes = ""
+        val appendCommand = arrayOf("sh", "-c", "cat $bytes > $pipe1")
+        Runtime.getRuntime().exec(appendCommand)
+    }
+
+    private fun getBitmap(bitmap:Bitmap) : Int{
+        return 0
     }
 
     private fun start() {
         timeline = ValueAnimator()
-        timeline.setValues(PropertyValuesHolder.ofInt("x", 300, 600 ))
+        timeline.setValues(PropertyValuesHolder.ofInt("x", 300, 600))
         timeline.addUpdateListener {
             Log.d("VALUE", it.animatedFraction.toString())
         }
@@ -149,7 +159,7 @@ class MainActivity : AppCompatActivity() {
             copyFileToExternalStorage(R.raw.test_video_one, FILE1_NAME)
             copyFileToExternalStorage(R.raw.test_video_two, FILE2_NAME)
             startNewFFMpeg()
-          //  startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
+            //  startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
         }
     }
 

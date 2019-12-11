@@ -45,7 +45,7 @@ dependencies {
     implementation 'io.coil-kt:coil-gif:0.8.0'
 
     implementation 'nl.bravobit:android-ffmpeg:1.1.1'
-//    implementation 'com.arthenica:mobile-ffmpeg-full:4.3'
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.3'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
