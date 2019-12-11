@@ -20,6 +20,7 @@ import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
 import nl.bravobit.ffmpeg.FFmpeg
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import java.io.BufferedWriter
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -70,8 +71,10 @@ class MainActivity : AppCompatActivity() {
         Runtime.getRuntime().exec(appendCommand)
     }
 
-    private fun getBitmap(bitmap:Bitmap) : Int{
-        return 0
+    private fun getBitmap(bitmap:Bitmap) : ByteArray{
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        return byteArrayOutputStream.toByteArray()
     }
 
     private fun start() {
