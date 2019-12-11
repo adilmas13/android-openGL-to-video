@@ -2,7 +2,26 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/canvas"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_bright">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ivBG"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sunny" />
+
+    <TextView
+        android:id="@+id/tvSunny"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/holo_green_light"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/sunny_jaisi_koi_nahein"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="32sp"
+        android:textStyle="bold" />
 
 </FrameLayout>

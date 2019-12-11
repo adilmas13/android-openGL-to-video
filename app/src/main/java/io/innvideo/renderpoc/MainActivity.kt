@@ -1,10 +1,16 @@
 package io.innvideo.renderpoc
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.os.Environment
+import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import io.innvideo.renderpoc.utils.getXTranslationBasedOnStartEndVal
+import kotlinx.android.synthetic.main.activity_main.*
 import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
 import nl.bravobit.ffmpeg.FFmpeg
 import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
@@ -21,17 +27,59 @@ import java.io.Writer
 
 class MainActivity : AppCompatActivity() {
 
+    private var screenWidth = 0
+
     companion object {
         private const val folderName = "RenderPOC"
         private const val FILE1_NAME = "test.mp4"
         private const val FILE2_NAME = "test2.mp4"
         private const val OUTPUT_NAME = "output.mp4"
+
+        const val ALPHA_FROM = 0f
+        const val ALPHA_TO = 1f
+        const val ANIM_DURATION = 2000
+        const val ANIM_END_VAL = 0f
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initViews()
+    }
+
+    private fun initViews() {
+        tvSunny.alpha = 0f
         fetchIsFFmpegSupported()
+        setScreenWidth()
+        animateText()
+    }
+
+    private fun setScreenWidth() {
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        screenWidth = displayMetrics.widthPixels
+    }
+
+    private fun getObjectAnimatorRightToLeft(view: View): ObjectAnimator {
+        val viewObjAnim = view.getXTranslationBasedOnStartEndVal(
+            fetchViewPositionOutOfScreenX(view), ANIM_END_VAL, ANIM_DURATION, ALPHA_FROM, ALPHA_TO
+        )
+        viewObjAnim.startDelay = 500
+        return viewObjAnim
+    }
+
+    private fun fetchViewPositionOutOfScreenX(view: View): Float =
+        (screenWidth - view.left).toFloat()
+
+    private fun animateText() {
+        tvSunny.post {
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(
+                getObjectAnimatorRightToLeft(tvSunny)
+            )
+            animatorSet.startDelay = 1000
+            animatorSet.start()
+        }
     }
 
 
@@ -58,16 +106,7 @@ class MainActivity : AppCompatActivity() {
     private fun getAppFolderPath() = "${Environment.getExternalStorageDirectory()}/${folderName}/"
 
     private fun startFFmpeg(videoOne: String, videoTwo: String) {
-        /*  var videoOne = copyInputStreamToFile(
-              resources.openRawResource(R.raw.test_video_one),
-              getOutputMediaFile("video_one.mp4")!!
-          ).absolutePath
-          var videoTwo = copyInputStreamToFile(
-              resources.openRawResource(R.raw.test_video_two),
-              getOutputMediaFile("video_two")!!
-          ).absolutePath*/
-//        var outputFile = getOutputMediaFile("output").toString()
-        val list = generateList(arrayOf(videoOne, videoTwo))
+        val list = generateList(arrayOf(videoTwo, videoOne))
         var outputFile = "${getAppFolderPath()}${OUTPUT_NAME}"
         val command1 = arrayOf(
             "-f",
@@ -79,34 +118,6 @@ class MainActivity : AppCompatActivity() {
             "-c",
             "copy",
             outputFile
-        )
-        val command = arrayOf(
-            "-y",
-            "-i",
-            videoOne,
-            "-i",
-            videoTwo,
-            "-strict",
-            "experimental",
-            "-filter_complex",
-            "[0:v]scale=480x640,setsar=1:1[v0];[1:v]scale=480x640,setsar=1:1[v1];[v0][0:a][v1][1:a] concat=n=2:v=1:a=1",
-            "-ab",
-            "48000",
-            "-ac",
-            "2",
-            "-ar",
-            "22050",
-            "-s",
-            "480x640",
-            "-vcodec",
-            "libx264",
-            "-crf",
-            "27",
-            "-q",
-            "4",
-            "-preset",
-            "ultrafast",
-            outputFile.toString()
         )
         val TAG = "VIDEO_STITCHING"
         val ffmpeg = FFmpeg.getInstance(this)
@@ -241,18 +252,16 @@ class MainActivity : AppCompatActivity() {
         try {
             out = FileOutputStream(file)
             val buf = ByteArray(1024)
-            var len: Int = 0
+            val len = 0
             while ((len == input.read(buf))) {
-                out!!.write(buf, 0, len)
+                out.write(buf, 0, len)
             }
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
             // Ensure that the InputStreams are closed even if there's an exception.
             try {
-                if (out != null) {
-                    out!!.close()
-                }
+                out?.close()
 
                 // If you want to close the "in" InputStream yourself then remove this
                 // from here but ensure that you close it yourself eventually.
