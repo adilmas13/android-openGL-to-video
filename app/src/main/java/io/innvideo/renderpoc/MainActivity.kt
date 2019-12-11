@@ -2,6 +2,8 @@ package io.innvideo.renderpoc
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Environment
 import android.util.DisplayMetrics
@@ -28,6 +30,7 @@ import java.io.Writer
 class MainActivity : AppCompatActivity() {
 
     private var screenWidth = 0
+    lateinit var timeline: ValueAnimator
 
     companion object {
         private const val folderName = "RenderPOC"
@@ -39,12 +42,31 @@ class MainActivity : AppCompatActivity() {
         const val ALPHA_TO = 1f
         const val ANIM_DURATION = 2000
         const val ANIM_END_VAL = 0f
+
+        const val SECONDS = 5
+        const val DURATION = SECONDS * 1000
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initViews()
+        start()
+    }
+
+    private fun start() {
+        timeline = ValueAnimator()
+        timeline.setValues(PropertyValuesHolder.ofInt("x", 300, 600 ))
+        timeline.addUpdateListener {
+            Log.d("VALUE", it.animatedFraction.toString())
+        }
+        timeline.duration = 4000
+        timeline.startDelay = 2000
+        timeline.start()
+    }
+
+    private fun moveTo(time: Long) {
+        timeline.currentPlayTime = time
     }
 
     private fun initViews() {
