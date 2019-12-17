@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">RenderTest</string>
     <string name="sunny_jaisi_koi_nahein">Sunny jaisi koi nahein</string>
+    <string name="go_for_it"><![CDATA[Go for it =>]]></string>
 </resources>

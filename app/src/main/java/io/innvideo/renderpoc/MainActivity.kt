@@ -5,21 +5,29 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.arthenica.mobileffmpeg.Config
+import com.arthenica.mobileffmpeg.Level
+import com.arthenica.mobileffmpeg.util.AsyncExecuteTask
+import com.arthenica.mobileffmpeg.util.ExecuteCallback
 import io.innvideo.renderpoc.utils.getXTranslationBasedOnStartEndVal
 import kotlinx.android.synthetic.main.activity_main.*
-import nl.bravobit.ffmpeg.ExecuteBinaryResponseHandler
-import nl.bravobit.ffmpeg.FFmpeg
-import nl.bravobit.ffmpeg.exceptions.FFmpegCommandAlreadyRunningException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.BufferedWriter
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -48,31 +56,215 @@ class MainActivity : AppCompatActivity() {
 
         const val SECONDS = 5
         const val DURATION = SECONDS * 1000
+        const val VIDEO_OUTPUT = "awesome.mp4"
+        const val VIDEO_OUTPUT2 = "awesome2.mp4"
+    }
+
+    private fun myFunction() {
+        val list = generateList(arrayOf(VIDEO_OUTPUT, VIDEO_OUTPUT2))
+        val image = "/storage/emulated/0/Pictures/Screenshots/1.jpg"
+        val outputFile = File("${getAppFolderPath()}${VIDEO_OUTPUT}")
+        val outputFile2 = File("${getAppFolderPath()}${VIDEO_OUTPUT2}")
+        if (outputFile.exists()) {
+            outputFile.delete()
+        }
+        Log.d("TIMING", "STARTED => " + System.currentTimeMillis())
+        for (x in 0 until 100) {
+            Log.d("TIMING", "FRAME START => ")
+            var command = ""
+            if (outputFile.exists()) {
+                command = " -y -i $image -t 0.04 ${outputFile2.absolutePath}"
+                com.arthenica.mobileffmpeg.FFmpeg.execute(command)
+                command =
+                    "-y -f concat -safe 0 -i $list -c copy ${outputFile.absolutePath}"
+                com.arthenica.mobileffmpeg.FFmpeg.execute(command)
+            } else {
+                command = "-i $image -t 0.04 ${outputFile.absolutePath}"
+                com.arthenica.mobileffmpeg.FFmpeg.execute(command)
+            }
+        }
+        Log.d("TIMING", "END => " + System.currentTimeMillis())
+    }
+
+    private fun myFunction3() {
+        val stroke = "/storage/emulated/0/test/stroke.png"
+        val video = "/storage/emulated/0/test/video.mp4"
+        val outputFile = File("${getAppFolderPath()}${VIDEO_OUTPUT}").absoluteFile
+        val commandw = "-y -i $video -i $stroke -filter_complex \"[0:v][1:v] overlay=25:25:enable='between(t,0,4)'\" -pix_fmt yuv420p -c:a copy $outputFile"
+        Log.d("COMMAND", commandw)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val started = System.currentTimeMillis()
+            Log.d("TIMING", "STARTED => $started")
+            val code = com.arthenica.mobileffmpeg.FFmpeg.execute(commandw)
+            val ended = System.currentTimeMillis()
+            if (code == 0) {
+                Log.d("TIMING", "ENDED => $ended")
+                Log.d("TIMING", "FINAL => ${(ended - started)/1000}")
+                //      showToast("COMPLETED IN ${ended - started}")
+            } else {
+                Log.d("TIMING", "SOMETHING WENT WRONG")
+                //   showToast("SOMETHING WENT WRONG")
+            }
+        }
+    }
+
+    private fun myFunction2() {
+        val outputFile = File("${getAppFolderPath()}${VIDEO_OUTPUT}").absoluteFile
+        val type = "Jpg"
+//        val type = "PNG"
+        val imageNameFormat = "LandingPageVideo_%5d"
+        val images = "/storage/emulated/0/test/$type/$imageNameFormat.${type.toLowerCase()}"
+        val command = "-hide_banner -y -c:v libopenh264 -r 30 -start_number 0 -i $images $outputFile"
+        CoroutineScope(Dispatchers.IO).launch {
+            val started = System.currentTimeMillis()
+            Log.d("TIMING", "STARTED => $started")
+            val code = com.arthenica.mobileffmpeg.FFmpeg.execute(command)
+            val ended = System.currentTimeMillis()
+            if (code == 0) {
+                Log.d("TIMING", "ENDED => $ended")
+                Log.d("TIMING", "FINAL => ${(ended - started)/1000}")
+          //      showToast("COMPLETED IN ${ended - started}")
+            } else {
+                Log.d("TIMING", "SOMETHING WENT WRONG")
+             //   showToast("SOMETHING WENT WRONG")
+            }
+        }
+    }
+
+    fun View.getWidthAndHeightAfterRender(callback: (Int, Int) -> Unit) {
+        viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                if (width > 0 && height > 0) {
+                    viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    callback(width, height)
+                }
+            }
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initViews()
-        start()
-        // startNewFFMpeg()
+//        start()
+//        startFFmpeg(FILE1_NAME, FILE2_NAME)
+        /* canvas.getWidthAndHeightAfterRender { i, i2 ->
+
+         }
+         GlobalScope.launch {
+             delay(3000)
+             withContext(Dispatchers.Main) {
+                 startNewFFMpeg()
+             }
+         }*/
+        //startNewFFMpeg()
+//        copyFilesFromRawToStorage()
+        Config.setLogLevel(Level.AV_LOG_VERBOSE)
+        Config.enableLogCallback {
+            Log.d("FFMPEG_IT", it.text)
+        };
+        Handler().postDelayed({
+            myFunction3()
+        }, 3000)
+
     }
 
-    private fun startNewFFMpeg() {
-        copyFilesFromRawToStorage()
+    private fun trial() {
+        /*   val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
+           val pipe1 = Config.registerNewFFmpegPipe(this)
+
+           MyTask(object : DoneCallback {
+               override fun done() {
+                   Log.d("DONE", "DONE")
+               }
+           }).execute(command)*/
         val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
         val pipe1 = Config.registerNewFFmpegPipe(this)
-        val ffmpegCommand =
-            "-y -f rawvideo -pix_fmt argb -s 1080x1920 -i $pipe1 -c:v libx264 -r 25 $outputFilePath"
-        com.arthenica.mobileffmpeg.FFmpeg.execute(ffmpegCommand)
-        val bytes = ""
-        val appendCommand = arrayOf("sh", "-c", "cat $bytes > $pipe1")
-        Runtime.getRuntime().exec(appendCommand)
-        Config.closeFFmpegPipe(ffmpegCommand)
+        val command =
+            "-y -i \"$pipe1\" -c:v mpeg4 -r 25 $outputFilePath"
+        startFFMPEG(command)
     }
 
-    private fun getBitmap(bitmap: Bitmap): Int {
-        return 0
+
+    private fun startNewFFMpeg() {
+        Config.setLogLevel(Level.AV_LOG_VERBOSE)
+        Config.enableLogCallback {
+            Log.d("FFMPEG", it.text)
+        };
+        copyFilesFromRawToStorage()
+        val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
+        val inputFIle = "${getAppFolderPath()}${FILE1_NAME}"
+
+        val pipe1 = Config.registerNewFFmpegPipe(this)
+        /*val ffmpegCommand =
+            "-y -f rawvideo -pix_fmt argb -s 1080x1920 -r 10 -i $pipe1  -c:v libx264 $outputFilePath"*/
+
+        val ffmpegCommand =
+            "-y -i " + pipe1 + " -filter:v loop=loop=25*3:size=1 -c:v mpeg4 -r 25 " + outputFilePath
+        startCommand(ffmpegCommand)
+
+        /* CoroutineScope(Dispatchers.IO).launch {
+             com.arthenica.mobileffmpeg.FFmpeg.execute(ffmpegCommand)
+             val bytes = getBitmap(getBitmapFromView(canvas))
+             for (x in 0 until 10) {
+                 val appendCommand = arrayOf("sh", "-c", "cat $inputFIle > $pipe1")
+                 Runtime.getRuntime().exec(appendCommand)
+             }
+             Config.closeFFmpegPipe(ffmpegCommand)
+         }*/
+    }
+
+
+    private fun startFFMPEG(command: String) {
+        var image1File = File(this.cacheDir, "abc.jpg")
+        val image =
+            "/storage/emulated/0/Pictures/Screenshots/1.jpg" //getFilePath("Pictures/Screenshots/1.jpg")
+        val pipe1 = Config.registerNewFFmpegPipe(this)
+        try {
+            var asyncCommand = AsyncExecuteTask(object : ExecuteCallback {
+                override fun apply(returnCode: Int, executeOutput: String?) {
+                    showToast("AA GAYA")
+                }
+
+            });
+            asyncCommand.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, command);
+            for (i in 0..50) {
+                var asyncCatImageCmd = AsyncCatImageTask();
+                asyncCatImageCmd.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, image, pipe1)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun startCommand(command: String) {
+        val callback = object : ExecuteCallback {
+            override fun apply(returnCode: Int, executeOutput: String?) {
+                Log.d("TEST", "HERE")
+            }
+        }
+        val task = AsyncExecuteTask(callback)
+        task.execute(command)
+    }
+
+    private fun getBitmap(bitmap: Bitmap): ByteArray {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        return byteArrayOutputStream.toByteArray()
+    }
+
+    private fun getBitmapFromView(view: View): Bitmap {
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        val bitmap = Bitmap.createBitmap(
+            view.measuredWidth, view.measuredHeight,
+            Bitmap.Config.ARGB_8888
+        );
+        val canvas = Canvas(bitmap);
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight);
+        view.draw(canvas);
+        return bitmap;
     }
 
     private fun start() {
@@ -91,7 +283,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        tvSunny.alpha = 0f
+        //    tvSunny.alpha = 0f
         fetchIsFFmpegSupported()
         setScreenWidth()
         animateText()
@@ -148,19 +340,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchIsFFmpegSupported() {
-        if (FFmpeg.getInstance(this).isSupported) {
+     /*   if (FFmpeg.getInstance(this).isSupported) {
             //  startFFmpeg()
         } else {
             Log.e("FFMPEG", "FF MPeg is not supported")
-        }
+        }*/
     }
 
     private fun copyFilesFromRawToStorage() {
         createDirectoryIfNotExisting {
             copyFileToExternalStorage(R.raw.test_video_one, FILE1_NAME)
             copyFileToExternalStorage(R.raw.test_video_two, FILE2_NAME)
-            startNewFFMpeg()
-            //  startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
+            startFFmpeg(getFilePath(FILE1_NAME), getFilePath(FILE2_NAME))
         }
     }
 
@@ -184,7 +375,7 @@ class MainActivity : AppCompatActivity() {
             outputFile
         )
         val TAG = "VIDEO_STITCHING"
-        val ffmpeg = FFmpeg.getInstance(this)
+       /* val ffmpeg = FFmpeg.getInstance(this)
         var hasError = false
         try {
             // to execute "ffmpeg -version" command you just need to pass "-version"
@@ -222,7 +413,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: FFmpegCommandAlreadyRunningException) {
             showToast("FFMPEG ALREADY RUNNING")
             // Handle if FFmpeg is already running
-        }
+        }*/
     }
 
     private fun generateList(inputs: Array<String>): String? {
@@ -336,4 +527,44 @@ class MainActivity : AppCompatActivity() {
             return file
         }
     }
+
+    inner class MyTask(private val callback: DoneCallback) : AsyncTask<String, Int, Int>() {
+
+        override fun doInBackground(vararg command: String?): Int {
+            return com.arthenica.mobileffmpeg.FFmpeg.execute(command[0])
+        }
+
+        override fun onPostExecute(result: Int?) {
+            callback.done()
+        }
+    }
+
+    interface DoneCallback {
+        fun done()
+    }
+
+
+    inner class AsyncCatImageTask : AsyncTask<String?, Int?, Int>() {
+        override fun doInBackground(vararg inputs: String?): Int {
+            try {
+                val asyncCommand = "cat " + inputs[0] + " > " + inputs[1]
+                Log.d("TEST", String.format("Starting async cat image command: %s", asyncCommand))
+                val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", asyncCommand))
+                val rc = process.waitFor()
+                Log.d(
+                    "TEST",
+                    String.format(
+                        "Async cat image command: %s exited with %d.",
+                        asyncCommand,
+                        rc
+                    )
+                )
+                return rc
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                return -1
+            }
+        }
+    }
+
 }
