@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var timeline: ValueAnimator
 
     companion object {
-        private const val folderName = "RenderPOC"
+        private const val folderName = "aa"
         private const val FILE1_NAME = "test.mp4"
         private const val FILE2_NAME = "test2.mp4"
         private const val OUTPUT_NAME = "output.mp4"
@@ -87,10 +87,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun myFunction3() {
-        val stroke = "/storage/emulated/0/test/stroke.png"
-        val video = "/storage/emulated/0/test/video.mp4"
+        val stroke = "/storage/emulated/0/aa/stroke.png"
+        val video = "/storage/emulated/0/aa/video.mp4"
         val outputFile = File("${getAppFolderPath()}${VIDEO_OUTPUT}").absoluteFile
-        val commandw = "-y -i $video -i $stroke -filter_complex \"[0:v][1:v] overlay=25:25:enable='between(t,0,4)'\" -pix_fmt yuv420p -c:a copy $outputFile"
+//        val commandw = "-y -i $video -i $stroke -filter_complex \"[0:v][1:v] overlay=25:25:enable='between(t,0,4)'\" -pix_fmt yuv420p -c:a copy $outputFile"
+        val commandw =
+            "-y -i $video -i $stroke -filter_complex 'overlay=10:main_h-overlay_h-10' -vcodec libx264 -c:a copy -preset ultrafast -y -tune fastdecode -profile:v high $outputFile"
         Log.d("COMMAND", commandw)
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             val ended = System.currentTimeMillis()
             if (code == 0) {
                 Log.d("TIMING", "ENDED => $ended")
-                Log.d("TIMING", "FINAL => ${(ended - started)/1000}")
+                Log.d("TIMING", "FINAL => ${(ended - started) / 1000}")
                 //      showToast("COMPLETED IN ${ended - started}")
             } else {
                 Log.d("TIMING", "SOMETHING WENT WRONG")
@@ -115,7 +117,8 @@ class MainActivity : AppCompatActivity() {
 //        val type = "PNG"
         val imageNameFormat = "LandingPageVideo_%5d"
         val images = "/storage/emulated/0/test/$type/$imageNameFormat.${type.toLowerCase()}"
-        val command = "-hide_banner -y -c:v libopenh264 -r 30 -start_number 0 -i $images $outputFile"
+        val command =
+            "-hide_banner -y -c:v libopenh264 -r 30 -start_number 0 -i $images $outputFile"
         CoroutineScope(Dispatchers.IO).launch {
             val started = System.currentTimeMillis()
             Log.d("TIMING", "STARTED => $started")
@@ -123,11 +126,11 @@ class MainActivity : AppCompatActivity() {
             val ended = System.currentTimeMillis()
             if (code == 0) {
                 Log.d("TIMING", "ENDED => $ended")
-                Log.d("TIMING", "FINAL => ${(ended - started)/1000}")
-          //      showToast("COMPLETED IN ${ended - started}")
+                Log.d("TIMING", "FINAL => ${(ended - started) / 1000}")
+                //      showToast("COMPLETED IN ${ended - started}")
             } else {
                 Log.d("TIMING", "SOMETHING WENT WRONG")
-             //   showToast("SOMETHING WENT WRONG")
+                //   showToast("SOMETHING WENT WRONG")
             }
         }
     }
@@ -340,11 +343,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchIsFFmpegSupported() {
-     /*   if (FFmpeg.getInstance(this).isSupported) {
-            //  startFFmpeg()
-        } else {
-            Log.e("FFMPEG", "FF MPeg is not supported")
-        }*/
+        /*   if (FFmpeg.getInstance(this).isSupported) {
+               //  startFFmpeg()
+           } else {
+               Log.e("FFMPEG", "FF MPeg is not supported")
+           }*/
     }
 
     private fun copyFilesFromRawToStorage() {
@@ -375,45 +378,45 @@ class MainActivity : AppCompatActivity() {
             outputFile
         )
         val TAG = "VIDEO_STITCHING"
-       /* val ffmpeg = FFmpeg.getInstance(this)
-        var hasError = false
-        try {
-            // to execute "ffmpeg -version" command you just need to pass "-version"
-            ffmpeg.execute(command1, object : ExecuteBinaryResponseHandler() {
+        /* val ffmpeg = FFmpeg.getInstance(this)
+         var hasError = false
+         try {
+             // to execute "ffmpeg -version" command you just need to pass "-version"
+             ffmpeg.execute(command1, object : ExecuteBinaryResponseHandler() {
 
-                override fun onStart() {
-                    showToast("VIDEO STITCHING STARTED")
-                }
+                 override fun onStart() {
+                     showToast("VIDEO STITCHING STARTED")
+                 }
 
-                override fun onProgress(message: String?) {
-                    Log.d(TAG, "Progress --->$message")
-                    showToast("PROGRESS $message")
-                }
+                 override fun onProgress(message: String?) {
+                     Log.d(TAG, "Progress --->$message")
+                     showToast("PROGRESS $message")
+                 }
 
-                override fun onFailure(message: String?) {
-                    Log.e(TAG, message ?: "Something went wrong")
-                    showToast("VIDEO FAILED => $message")
-                    hasError = true
-                }
+                 override fun onFailure(message: String?) {
+                     Log.e(TAG, message ?: "Something went wrong")
+                     showToast("VIDEO FAILED => $message")
+                     hasError = true
+                 }
 
-                override fun onSuccess(message: String?) {
-                    Log.d(TAG, "VIDEO STITCHED SUCCESSFULLY --->$message")
-                    showToast("VIDEO STITCHED SUCCESSFULLY")
-                }
+                 override fun onSuccess(message: String?) {
+                     Log.d(TAG, "VIDEO STITCHED SUCCESSFULLY --->$message")
+                     showToast("VIDEO STITCHED SUCCESSFULLY")
+                 }
 
-                override fun onFinish() {
-                    showToast(
-                        "VIDEO STITCHED COMPLETED ${
-                        if (hasError) "WITH ERRORS" else ""
-                        }"
-                    )
-                }
+                 override fun onFinish() {
+                     showToast(
+                         "VIDEO STITCHED COMPLETED ${
+                         if (hasError) "WITH ERRORS" else ""
+                         }"
+                     )
+                 }
 
-            })
-        } catch (e: FFmpegCommandAlreadyRunningException) {
-            showToast("FFMPEG ALREADY RUNNING")
-            // Handle if FFmpeg is already running
-        }*/
+             })
+         } catch (e: FFmpegCommandAlreadyRunningException) {
+             showToast("FFMPEG ALREADY RUNNING")
+             // Handle if FFmpeg is already running
+         }*/
     }
 
     private fun generateList(inputs: Array<String>): String? {
