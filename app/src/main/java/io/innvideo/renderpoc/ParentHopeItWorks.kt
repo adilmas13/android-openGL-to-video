@@ -13,7 +13,7 @@ import java.nio.ShortBuffer
 
 
 class ParentHopeItWorks(
-    context: Context,
+    private var context: Context,
     private var texture: SurfaceTexture,
     private var myWidth: Int,
     private var myHeight: Int
@@ -49,8 +49,6 @@ class ParentHopeItWorks(
 
 
     private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3)
-
-    private val ctx: Context? = null
 
     // Texture to be shown in background
     private var textureBuffer: FloatBuffer? = null
@@ -132,7 +130,7 @@ class ParentHopeItWorks(
 
     override fun initGLComponents() {
         setupVertexBuffer()
-        setupTexture(ctx!!)
+        setupTexture(context)
         loadShaders()
     }
 

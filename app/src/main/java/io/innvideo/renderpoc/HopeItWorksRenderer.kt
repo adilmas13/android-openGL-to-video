@@ -28,14 +28,17 @@ abstract class HopeItWorksRenderer(
     private lateinit var eglSurface: EGLSurface
     private var step = 0
 
-    companion object {
-        private const val TAG = "HopeItWorksRenderer"
-    }
+    private var thread: Thread? = null
 
     fun letsRun() {
         running = true
-        val thread = Thread(this)
-        thread.start()
+        thread = Thread(this)
+        thread?.start()
+    }
+
+    fun stopIt() {
+        running = false
+        thread?.interrupt()
     }
 
     override fun run() {
