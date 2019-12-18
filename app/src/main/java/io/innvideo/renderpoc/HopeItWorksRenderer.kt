@@ -13,7 +13,7 @@ import javax.microedition.khronos.egl.EGLSurface
 
 
 abstract class HopeItWorksRenderer(
-    private val texture: SurfaceTexture,
+    private val texture: Any,
     private var width: Int,
     private var height: Int
 ) : Runnable {
