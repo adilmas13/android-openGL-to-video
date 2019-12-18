@@ -14,13 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".GLActivity">
+        <activity android:name=".HopeItWorksActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".GLActivity" />
         <activity android:name=".BasicActivity" />
         <activity android:name=".SurfaceActivity" />
         <activity android:name=".MainActivity" />
