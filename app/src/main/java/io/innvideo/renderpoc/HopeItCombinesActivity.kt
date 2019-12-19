@@ -4,9 +4,11 @@ import android.graphics.SurfaceTexture
 import android.opengl.EGL14
 import android.opengl.GLUtils
 import android.os.Bundle
+import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
+import io.innvideo.renderpoc.utils.toastIt
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
@@ -19,6 +21,7 @@ class HopeItCombinesActivity : AppCompatActivity() {
     private lateinit var egl: EGL10
     private lateinit var eglDisplay: EGLDisplay
     private lateinit var eglContext: EGLContext
+    private lateinit var eglConfig: EGLConfig
     private lateinit var eglSurface: EGLSurface
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +40,21 @@ class HopeItCombinesActivity : AppCompatActivity() {
     private fun bhaiChal(surfaceTexture: SurfaceTexture) {
         // STEP 1: INITIALIZE GL
         initializeGL()
+        // STEP 2 : Bind Surface with OpenGL
+        bindSurfaceTextureToGL(surfaceTexture)
+    }
+
+    private fun bindSurfaceTextureToGL(surfaceTexture: SurfaceTexture) {
+        // Step 1 : Bind GL with the surface texture to enable drawing
+        eglSurface =
+            egl.eglCreateWindowSurface(eglDisplay, eglConfig, Surface(surfaceTexture), null)
+        // Step 2 : To activate drawing
+        val boolean = egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
+        if (boolean) {
+            toastIt("Activated to draw")
+        } else {
+            toastIt("Something went wrong")
+        }
     }
 
     /*
@@ -55,7 +73,7 @@ class HopeItCombinesActivity : AppCompatActivity() {
         // Step 3 : get initialize the display
         egl.eglInitialize(eglDisplay, IntArray(2))
         // Step 4 : Specify the config
-        val eglConfig = chooseEglConfig()
+        eglConfig = chooseEglConfig()!!
         // Step 5 : Create the context
         eglContext = egl.eglCreateContext(
             eglDisplay,
