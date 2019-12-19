@@ -1,8 +1,6 @@
 package io.innvideo.renderpoc
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.SurfaceTexture
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
