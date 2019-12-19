@@ -9,21 +9,25 @@ import android.view.Surface
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
-import io.innvideo.renderpoc.utils.toastIt
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.FloatBuffer
+import java.nio.ShortBuffer
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
 import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.egl.EGLSurface
 
+
 class HopeItCombinesActivity : AppCompatActivity() {
 
-    private lateinit var egl: EGL10
-    private lateinit var eglDisplay: EGLDisplay
-    private lateinit var eglContext: EGLContext
-    private lateinit var eglConfig: EGLConfig
-    private lateinit var eglSurface: EGLSurface
+    private lateinit var surfaceTexture: SurfaceTexture
+
+    private lateinit var renderer: RendererBaba
+
+    private lateinit var thread: Thread
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,113 +37,166 @@ class HopeItCombinesActivity : AppCompatActivity() {
 
     private fun init() {
         textureView.onSurfaceTextureAvailable { surfaceTexture, _, _ ->
-            surfaceTexture.setOnFrameAvailableListener { logIt("FRAME AVAILABLE") }
-            bhaiChal(surfaceTexture)
+            renderer = RendererBaba(surfaceTexture)
+            thread = Thread(renderer)
+            thread.start()
+            this.surfaceTexture = surfaceTexture
         }
-    }
-
-    private fun bhaiChal(surfaceTexture: SurfaceTexture) {
-        // STEP 1: INITIALIZE GL
-        initializeGL()
-        // STEP 2 : BIND SURFACE WITH OPEN GL
-        bindSurfaceTextureToGL(surfaceTexture)
-        // STEP 3 : DRAW
-        draw(surfaceTexture)
-    }
-
-    private fun draw(surfaceTexture: SurfaceTexture) {
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        surfaceTexture.updateTexImage()
-    }
-
-    /*  1. Create a window surface by binding the textureView with GL
-        2. Activate the new surface for drawing
-    * reference - https://www.androidcookbook.info/opengl-3d/associating-a-drawing-surface-with-opengl-es-through-the-egl-context.html
-    * */
-    private fun bindSurfaceTextureToGL(surfaceTexture: SurfaceTexture) {
-        // Step 1 : Bind GL with the surface texture to enable drawing
-        eglSurface =
-            egl.eglCreateWindowSurface(eglDisplay, eglConfig, Surface(surfaceTexture), null)
-        // Step 2 : To activate drawing
-        val boolean = egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
-        if (boolean) {
-            toastIt("Activated to draw")
-        } else {
-            toastIt("Something went wrong")
-        }
-    }
-
-    /*
-    *   1. Get an implementation of EGL10.
-        2. Get a display to use.
-        3. Initialize the display.
-        4. Specify a device-specific configuration to EGL.
-        5. Use an initialized display and a configuration to get an EGL context.
-        * Reference - https://www.androidcookbook.info/opengl-3d/getting-an-egl-context.html
-        * */
-    private fun initializeGL() {
-        // Step 1: get Egl Object
-        egl = EGLContext.getEGL() as EGL10
-        // Step 2: get instance of the egl object
-        eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
-        // Step 3 : get initialize the display
-        egl.eglInitialize(eglDisplay, IntArray(2))
-        // Step 4 : Specify the config
-        eglConfig = chooseEglConfig()!!
-        // Step 5 : Create the context
-        eglContext = egl.eglCreateContext(
-            eglDisplay,
-            eglConfig,
-            EGL10.EGL_NO_CONTEXT,
-            intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE)
-        )
-    }
-
-
-    private fun release() {
-        egl.eglMakeCurrent(
-            eglDisplay,
-            EGL10.EGL_NO_SURFACE,
-            EGL10.EGL_NO_SURFACE,
-            EGL10.EGL_NO_CONTEXT
-        )
-        egl.eglDestroyContext(eglDisplay, eglContext)
-        egl.eglTerminate(eglDisplay)
-        eglDisplay = EGL10.EGL_NO_DISPLAY
-        eglContext = EGL10.EGL_NO_CONTEXT
-    }
-
-    private fun chooseEglConfig(): EGLConfig? {
-        val configsCount = IntArray(1)
-        val configs: Array<EGLConfig?> = arrayOfNulls<EGLConfig>(1)
-        val configSpec = getConfig()
-        require(egl.eglChooseConfig(eglDisplay, configSpec, configs, 1, configsCount)) {
-            "Failed to choose config: " + GLUtils.getEGLErrorString(
-                egl.eglGetError()
-            )
-        }
-        return if (configsCount[0] > 0) {
-            configs[0]
-        } else null
-    }
-
-    private fun getConfig(): IntArray {
-        return intArrayOf(
-            EGL10.EGL_RENDERABLE_TYPE,
-            EGL14.EGL_OPENGL_ES2_BIT,
-            EGL10.EGL_RED_SIZE, 8,
-            EGL10.EGL_GREEN_SIZE, 8,
-            EGL10.EGL_BLUE_SIZE, 8,
-            EGL10.EGL_ALPHA_SIZE, 8,
-            EGL10.EGL_DEPTH_SIZE, 0,
-            EGL10.EGL_STENCIL_SIZE, 0,
-            EGL10.EGL_NONE
-        )
     }
 
     override fun onDestroy() {
-        release()
+        renderer.release()
+        thread.interrupt()
         super.onDestroy()
     }
+
+    inner class RendererBaba(private val surfaceTexture: SurfaceTexture) : Runnable {
+
+        private lateinit var egl: EGL10
+        private lateinit var eglDisplay: EGLDisplay
+        private lateinit var eglContext: EGLContext
+        private lateinit var eglConfig: EGLConfig
+        private lateinit var eglSurface: EGLSurface
+
+        private var isRunning = false
+
+        private val VERTS = 3
+
+        //A raw native buffer to hold the point coordinates
+        private lateinit var mFVertexBuffer: FloatBuffer;
+
+        //A raw native buffer to hold indices //allowing a reuse of points.
+        private lateinit var mIndexBuffer: ShortBuffer;
+
+        init {
+            surfaceTexture.setOnFrameAvailableListener {
+                logIt("FRAME AVAILABLE")
+                surfaceTexture.updateTexImage()
+            }
+        }
+
+        override fun run() {
+            logIt("=== STARTED ===")
+            initializeGL()
+            bindSurfaceTextureToGL()
+
+            val vbb: ByteBuffer = ByteBuffer.allocateDirect(VERTS * 3 * 4)
+            vbb.order(ByteOrder.nativeOrder());
+            mFVertexBuffer = vbb.asFloatBuffer()
+
+            val ibb = ByteBuffer.allocateDirect(VERTS * 2)
+
+            ibb.order(ByteOrder.nativeOrder())
+
+            mIndexBuffer = ibb.asShortBuffer()
+            val coords = floatArrayOf(
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.0f, 0.5f, 0.0f
+            )
+            for (i in 0 until VERTS) {
+                for (j in 0 until 3) {
+                    mFVertexBuffer.put(coords[i * 3 + j])
+                }
+            }
+            var myIndicesArray = shortArrayOf(0, 1, 2)
+            (0 until 3).forEach {
+                mIndexBuffer.put(myIndicesArray[it])
+            }
+            mFVertexBuffer.position(0)
+            mIndexBuffer.position(0)
+            isRunning = true
+            GLES20.glClearColor(0f, 0f, 0f, 1f)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+            egl.eglSwapBuffers(eglDisplay, eglSurface)
+        }
+
+        /*  1. Create a window surface by binding the textureView with GL
+        2. Activate the new surface for drawing
+    * reference - https://www.androidcookbook.info/opengl-3d/associating-a-drawing-surface-with-opengl-es-through-the-egl-context.html
+    * */
+        private fun bindSurfaceTextureToGL() {
+            // Step 1 : Bind GL with the surface texture to enable drawing
+            eglSurface =
+                egl.eglCreateWindowSurface(eglDisplay, eglConfig, Surface(surfaceTexture), null)
+            // Step 2 : To activate drawing
+            val activated = egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
+            logIt("=== ACTIVE STATUE ===> ${activated}")
+        }
+
+        /*
+        *   1. Get an implementation of EGL10.
+            2. Get a display to use.
+            3. Initialize the display.
+            4. Specify a device-specific configuration to EGL.
+            5. Use an initialized display and a configuration to get an EGL context.
+            * Reference - https://www.androidcookbook.info/opengl-3d/getting-an-egl-context.html
+            * */
+        private fun initializeGL() {
+            // Step 1: get Egl Object
+            egl = EGLContext.getEGL() as EGL10
+            // Step 2: get instance of the egl display object
+            eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
+            // Step 3 : get initialize the display
+            egl.eglInitialize(eglDisplay, IntArray(2))
+            // Step 4 : Specify the config
+            eglConfig = chooseEglConfig()!!
+            // Step 5 : Create the context
+            eglContext = egl.eglCreateContext(
+                eglDisplay,
+                eglConfig,
+                EGL10.EGL_NO_CONTEXT,
+                intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE)
+            )
+        }
+
+        fun release() {
+            logIt("=== RELEASING ===>")
+            isRunning = false
+            egl.eglMakeCurrent(
+                eglDisplay,
+                EGL10.EGL_NO_SURFACE,
+                EGL10.EGL_NO_SURFACE,
+                EGL10.EGL_NO_CONTEXT
+            )
+            egl.eglDestroyContext(eglDisplay, eglContext)
+            egl.eglTerminate(eglDisplay)
+            eglDisplay = EGL10.EGL_NO_DISPLAY
+            eglContext = EGL10.EGL_NO_CONTEXT
+        }
+
+        private fun chooseEglConfig(): EGLConfig? {
+            val configsCount = IntArray(1)
+            val configs: Array<EGLConfig?> = arrayOfNulls<EGLConfig>(1)
+            val configSpec = getConfig()
+            require(egl.eglChooseConfig(eglDisplay, configSpec, configs, 1, configsCount)) {
+                "Failed to choose config: " + GLUtils.getEGLErrorString(
+                    egl.eglGetError()
+                )
+            }
+            return if (configsCount[0] > 0) {
+                configs[0]
+            } else null
+        }
+
+        private fun getConfig(): IntArray {
+            return intArrayOf(
+                EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
+                EGL10.EGL_RED_SIZE, 8,
+                EGL10.EGL_GREEN_SIZE, 8,
+                EGL10.EGL_BLUE_SIZE, 8,
+                EGL10.EGL_ALPHA_SIZE, 8,
+                EGL10.EGL_DEPTH_SIZE, 0,
+                EGL10.EGL_STENCIL_SIZE, 0,
+                EGL10.EGL_NONE
+            )
+        }
+
+        private fun draw() {
+            GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        }
+
+    }
+
 }
