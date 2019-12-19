@@ -1,6 +1,5 @@
 package io.innvideo.renderpoc
 
-import android.graphics.SurfaceTexture
 import android.opengl.EGL14.EGL_CONTEXT_CLIENT_VERSION
 import android.opengl.EGL14.EGL_OPENGL_ES2_BIT
 import android.opengl.GLUtils
@@ -12,14 +11,14 @@ import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.egl.EGLSurface
 
 
-abstract class HopeItWorksRenderer(
+abstract class TextureSurfaceRenderer(
     private val texture: Any,
     private var width: Int,
     private var height: Int
 ) : Runnable {
 
     protected abstract fun initGLComponents()
-    protected abstract fun deinitGLComponents()
+    protected abstract fun deInitGLComponents()
     protected abstract fun draw(): Boolean
     private var running = false
     private lateinit var egl: EGL10
@@ -61,11 +60,11 @@ abstract class HopeItWorksRenderer(
             }
         }
 
-        deinitGLComponents()
-        deinitGL()
+        deInitGLComponents()
+        deInitGL()
     }
 
-    private fun deinitGL() {
+    private fun deInitGL() {
         egl.eglMakeCurrent(
             eglDisplay,
             EGL10.EGL_NO_SURFACE,
@@ -138,6 +137,4 @@ abstract class HopeItWorksRenderer(
     fun onPause() {
         running = false
     }
-
-
 }

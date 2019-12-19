@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         Config.setLogLevel(Level.AV_LOG_VERBOSE)
         Config.enableLogCallback {
             Log.d("FFMPEG_IT", it.text)
-        };
+        }
         Handler().postDelayed({
             myFunction3()
         }, 3000)
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         Config.setLogLevel(Level.AV_LOG_VERBOSE)
         Config.enableLogCallback {
             Log.d("FFMPEG", it.text)
-        };
+        }
         copyFilesFromRawToStorage()
         val outputFilePath = "${getAppFolderPath()}${OUTPUT_NAME}"
         val inputFIle = "${getAppFolderPath()}${FILE1_NAME}"
@@ -231,10 +231,10 @@ class MainActivity : AppCompatActivity() {
                     showToast("AA GAYA")
                 }
 
-            });
-            asyncCommand.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, command);
+            })
+            asyncCommand.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, command)
             for (i in 0..50) {
-                var asyncCatImageCmd = AsyncCatImageTask();
+                var asyncCatImageCmd = AsyncCatImageTask()
                 asyncCatImageCmd.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, image, pipe1)
             }
         } catch (e: java.lang.Exception) {
@@ -259,15 +259,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getBitmapFromView(view: View): Bitmap {
-        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         val bitmap = Bitmap.createBitmap(
             view.measuredWidth, view.measuredHeight,
             Bitmap.Config.ARGB_8888
-        );
-        val canvas = Canvas(bitmap);
-        view.layout(0, 0, view.measuredWidth, view.measuredHeight);
-        view.draw(canvas);
-        return bitmap;
+        )
+        val canvas = Canvas(bitmap)
+        view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+        view.draw(canvas)
+        return bitmap
     }
 
     private fun start() {

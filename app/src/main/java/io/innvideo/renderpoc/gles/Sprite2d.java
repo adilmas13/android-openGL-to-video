@@ -25,7 +25,7 @@ public class Sprite2d {
     private static final String TAG = GlUtil.TAG;
 
     private Drawable2d mDrawable;
-    private float mColor[];
+    private float[] mColor;
     private int mTextureId;
     private float mAngle;
     private float mScaleX, mScaleY;

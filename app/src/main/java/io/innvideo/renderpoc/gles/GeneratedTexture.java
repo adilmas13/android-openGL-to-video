@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 public class GeneratedTexture {
     //private static final String TAG = GlUtil.TAG;
 
-    public enum Image { COARSE, FINE };
+    public enum Image { COARSE, FINE }
 
     // Basic colors, in little-endian RGBA.
     private static final int BLACK = 0x00000000;
@@ -42,11 +42,11 @@ public class GeneratedTexture {
     private static final int LOW = (int) 0x40000000L;
     private static final int TRANSP = 0;
 
-    private static final int GRID[] = new int[] {    // must be 16 elements
-        OPAQUE|RED,     OPAQUE|YELLOW,  OPAQUE|GREEN,   OPAQUE|MAGENTA,
-        OPAQUE|WHITE,   LOW|RED,        LOW|GREEN,      OPAQUE|YELLOW,
-        OPAQUE|MAGENTA, TRANSP|GREEN,   HALF|RED,       OPAQUE|BLACK,
-        OPAQUE|CYAN,    OPAQUE|MAGENTA, OPAQUE|CYAN,    OPAQUE|BLUE,
+    private static final int[] GRID = new int[]{    // must be 16 elements
+            OPAQUE | RED, OPAQUE | YELLOW, OPAQUE | GREEN, OPAQUE | MAGENTA,
+            OPAQUE | WHITE, LOW | RED, LOW | GREEN, OPAQUE | YELLOW,
+            OPAQUE | MAGENTA, TRANSP | GREEN, HALF | RED, OPAQUE | BLACK,
+            OPAQUE | CYAN, OPAQUE | MAGENTA, OPAQUE | CYAN, OPAQUE | BLUE,
     };
 
     private static final int TEX_SIZE = 64;         // must be power of 2

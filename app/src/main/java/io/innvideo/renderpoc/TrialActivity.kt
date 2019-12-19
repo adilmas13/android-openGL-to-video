@@ -1,0 +1,186 @@
+package io.innvideo.renderpoc
+
+import android.content.Context
+import android.graphics.SurfaceTexture
+import android.media.MediaCodec
+import android.media.MediaCodecInfo
+import android.media.MediaFormat
+import android.media.MediaMuxer
+import android.media.MediaPlayer
+import android.os.AsyncTask
+import android.os.Bundle
+import android.os.Environment
+import android.view.Surface
+import android.view.TextureView
+import androidx.appcompat.app.AppCompatActivity
+import io.innvideo.renderpoc.utils.logIt
+import io.innvideo.renderpoc.utils.toastIt
+import kotlinx.android.synthetic.main.activity_trial.*
+
+
+class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
+
+    private var inputSurface: Surface? = null
+    private var renderer: VideoTextureRenderer? = null
+    private var player: MediaPlayer? = null
+
+    companion object {
+        private val INPUT_FILE = "${Environment.getExternalStorageDirectory()}/aa/video.mp4"
+        private val OUTPUT_FILE = "${Environment.getExternalStorageDirectory()}/aa/v3.mp4"
+
+        // Media Codec Properties
+        private const val VIDEO_WIDTH = 640
+        private const val VIDEO_HEIGHT = 360
+        private const val VIDEO_BITRATE = 12200
+        private const val FRAME_INTERVAL = 10
+        private const val FPS = 30
+        private const val MAX_INPUT_SIZE = 0
+        private const val MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_trial)
+        init()
+    }
+
+    private fun init() {
+        textureView.surfaceTextureListener = this
+        playBtn.setOnClickListener { playVideo() }
+        renderBtn.setOnClickListener { renderIt() }
+    }
+
+    override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) =
+        Unit
+
+    override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) = Unit
+
+    override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?) = true
+
+    override fun onSurfaceTextureAvailable(
+        surfaceTexture: SurfaceTexture?,
+        width: Int,
+        height: Int
+    ) {
+        renderer = VideoTextureRenderer(this, surfaceTexture!!, width, height)
+        renderer?.letsRun()
+        player = MediaPlayer().apply {
+            setDataSource(INPUT_FILE)
+            setSurface(Surface(renderer?.getVideoTexture()))
+            renderer?.setVideoSize(this.videoWidth, this.videoHeight)
+            prepare()
+            setOnCompletionListener {
+                endRendering()
+            }
+        }
+    }
+
+    private fun playVideo() {
+        player?.start()
+    }
+
+    private fun renderIt() {
+        renderer?.stopIt()
+        RenderTask(
+            this,
+            textureView.surfaceTexture
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+    }
+
+    var isRendering = false
+    private fun endRendering() {
+        isRendering = false
+        inputSurface?.release()
+        toastIt("END")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        renderer?.stopIt()
+    }
+
+    inner class RenderTask(
+        private val context: Context,
+        private val texture: SurfaceTexture
+    ) :
+        AsyncTask<Void, Void, Boolean>() {
+        override fun doInBackground(vararg params: Void?): Boolean {
+            val mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
+            val format = MediaFormat.createVideoFormat(
+                MIME_TYPE,
+                VIDEO_WIDTH,
+                VIDEO_HEIGHT
+            )
+            format.apply {
+                setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, MAX_INPUT_SIZE)
+                setInteger(MediaFormat.KEY_BIT_RATE, VIDEO_BITRATE)
+                setInteger(MediaFormat.KEY_FRAME_RATE, FPS)
+                setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, FRAME_INTERVAL)
+                setInteger(
+                    MediaFormat.KEY_COLOR_FORMAT,
+                    MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
+                )
+            }
+            mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+            inputSurface = mediaCodec.createInputSurface()
+            player?.setSurface(inputSurface)
+            val render = FinalParentHopeItWorks(
+                context,
+                texture,
+                inputSurface!!,
+                VIDEO_WIDTH,
+                VIDEO_HEIGHT
+            )
+            render.letsRun()
+            mediaCodec.start()
+            player?.start()
+            val bufferInfo = MediaCodec.BufferInfo()
+
+            var isEOS = false
+
+            isRendering = true
+            val muxer = MediaMuxer(OUTPUT_FILE, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            muxer.setOrientationHint(90)
+            var trackIndex = muxer.addTrack(mediaCodec.outputFormat)
+//            muxer.start()
+            var exitCounter = 0
+            var isVisited = false
+            while (isEOS.not()) {
+                val index = mediaCodec.dequeueOutputBuffer(bufferInfo, 0)
+                if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                    logIt("BUFFER CHANGED")
+                } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    trackIndex = muxer.addTrack(mediaCodec.outputFormat)
+                    muxer.start()
+                    logIt("INFO_OUTPUT_FORMAT_CHANGED")
+                } else if (index < 0) {
+                    logIt("Unexpected error")
+                    break
+                } else if (index >= 0) {
+                    isVisited = true
+                    val byteBuffer = mediaCodec.getOutputBuffer(index)
+
+                    //        muxer.writeSampleData(trackIndex, byteBuffer!!, bufferInfo)
+                    mediaCodec.releaseOutputBuffer(index, true)
+                    if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        isEOS = true
+                    }
+                } else if (index == -1) {
+                    if (isVisited && ++exitCounter == 20) {
+                        isEOS = true
+                        mediaCodec.stop()
+                        mediaCodec.release()
+                    }
+                }
+            }
+            /*  muxer.stop()
+              muxer.release()*/
+            return false
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+            toastIt("ITS DONE")
+            super.onPostExecute(result)
+        }
+    }
+}

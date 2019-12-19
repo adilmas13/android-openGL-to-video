@@ -12,12 +12,12 @@ import java.nio.FloatBuffer
 import java.nio.ShortBuffer
 
 
-class ParentHopeItWorks(
+class VideoTextureRenderer(
     private var context: Context,
     private var texture: SurfaceTexture,
     private var myWidth: Int,
     private var myHeight: Int
-) : HopeItWorksRenderer(texture, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
+) : TextureSurfaceRenderer(texture, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
 
     private val vertexShaderCode = "attribute vec4 vPosition;" +
             "attribute vec4 vTexCoordinate;" +
@@ -95,7 +95,6 @@ class ParentHopeItWorks(
         }
     }
 
-
     private fun setupVertexBuffer() { // Draw list buffer
         val dlb: ByteBuffer = ByteBuffer.allocateDirect(drawOrder.size * 2)
         dlb.order(ByteOrder.nativeOrder())
@@ -110,7 +109,6 @@ class ParentHopeItWorks(
         vertexBuffer?.position(0)
     }
 
-
     private fun setupTexture(context: Context) {
         val texturebb: ByteBuffer = ByteBuffer.allocateDirect(textureCoords.size * 4)
         texturebb.order(ByteOrder.nativeOrder())
@@ -124,9 +122,8 @@ class ParentHopeItWorks(
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textures[0])
         checkGlError("Texture bind")
         texture = SurfaceTexture(textures[0])
-        texture?.setOnFrameAvailableListener(this)
+        texture.setOnFrameAvailableListener(this)
     }
-
 
     override fun initGLComponents() {
         setupVertexBuffer()
@@ -134,18 +131,18 @@ class ParentHopeItWorks(
         loadShaders()
     }
 
-    override fun deinitGLComponents() {
+    override fun deInitGLComponents() {
         GLES20.glDeleteTextures(1, textures, 0)
         GLES20.glDeleteProgram(shaderProgram)
-        texture?.release()
-        texture?.setOnFrameAvailableListener(null)
+        texture.release()
+        texture.setOnFrameAvailableListener(null)
     }
 
     override fun draw(): Boolean {
         synchronized(this) {
             frameAvailable = if (frameAvailable) {
-                texture!!.updateTexImage()
-                texture!!.getTransformMatrix(videoTextureTransform)
+                texture.updateTexImage()
+                texture.getTransformMatrix(videoTextureTransform)
                 false
             } else {
                 return false

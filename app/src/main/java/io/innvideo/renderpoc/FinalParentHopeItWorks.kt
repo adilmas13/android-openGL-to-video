@@ -19,7 +19,7 @@ class FinalParentHopeItWorks(
     private var surface:Surface,
     private var myWidth: Int,
     private var myHeight: Int
-) : HopeItWorksRenderer(texture, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
+) : TextureSurfaceRenderer(texture, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
 
     private val vertexShaderCode = "attribute vec4 vPosition;" +
             "attribute vec4 vTexCoordinate;" +
@@ -126,7 +126,7 @@ class FinalParentHopeItWorks(
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textures[0])
         checkGlError("Texture bind")
         texture = SurfaceTexture(textures[0])
-        texture?.setOnFrameAvailableListener(this)
+        texture.setOnFrameAvailableListener(this)
     }
 
 
@@ -136,20 +136,20 @@ class FinalParentHopeItWorks(
         loadShaders()
     }
 
-    override fun deinitGLComponents() {
+    override fun deInitGLComponents() {
         GLES20.glDeleteTextures(1, textures, 0)
         GLES20.glDeleteProgram(shaderProgram)
         if (texture is SurfaceTexture){
-            (texture as SurfaceTexture).release()
-            (texture as SurfaceTexture).setOnFrameAvailableListener(null)
+            texture.release()
+            texture.setOnFrameAvailableListener(null)
         }
     }
 
     override fun draw(): Boolean {
         synchronized(this) {
             frameAvailable = if (frameAvailable) {
-                texture!!.updateTexImage()
-                texture!!.getTransformMatrix(videoTextureTransform)
+                texture.updateTexImage()
+                texture.getTransformMatrix(videoTextureTransform)
                 false
             } else {
                 return false
