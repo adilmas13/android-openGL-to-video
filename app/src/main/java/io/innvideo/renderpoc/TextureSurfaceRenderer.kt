@@ -80,12 +80,17 @@ abstract class TextureSurfaceRenderer(
 
     private fun initGL() {
         logIt("${++step} initGL")
+
+        /**/
         egl = EGLContext.getEGL() as EGL10
         eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
         val version = IntArray(2)
         egl.eglInitialize(eglDisplay, version)
         val eglConfig = chooseEglConfig()
         eglContext = createContext(egl, eglDisplay, eglConfig!!)!!
+        /**/
+
+
         eglSurface = egl.eglCreateWindowSurface(eglDisplay, eglConfig, texture, null)
         if (eglSurface == null || eglSurface === EGL10.EGL_NO_SURFACE) {
             throw RuntimeException("GL Error: " + GLUtils.getEGLErrorString(egl.eglGetError()))

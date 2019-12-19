@@ -55,6 +55,7 @@ class TrialActivity : AppCompatActivity() {
     }
 
     private fun initTextureView() {
+        initCodec()
         textureView.onSurfaceTextureAvailable { surfaceTexture, width, height ->
             this.previewSurfaceTexture = surfaceTexture
             this.previewTextureHeight = height
@@ -68,23 +69,21 @@ class TrialActivity : AppCompatActivity() {
             previewRenderer?.letsRun {}
             this.player = MediaPlayer().apply {
                 setDataSource(INPUT_FILE)
-                setSurface(Surface(previewRenderer?.getVideoTexture()))
+//                setSurface(Surface(previewRenderer?.getVideoTexture()))
+                setSurface(inputSurface)
                 previewRenderer?.setVideoSize(this.videoWidth, this.videoHeight)
                 prepare()
                 setOnPreparedListener {
                     player?.start()
+                    renderIt()
                 }
             }
         }
     }
 
-    private fun playVideo() {
-
-    }
-
-    private fun renderIt() {
-        previewRenderer?.stopIt()
-        val mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
+    private lateinit var mediaCodec: MediaCodec
+    private fun initCodec() {
+        mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
         val format = MediaFormat.createVideoFormat(
             MIME_TYPE,
             VIDEO_WIDTH,
@@ -102,23 +101,33 @@ class TrialActivity : AppCompatActivity() {
         }
         mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         inputSurface = mediaCodec.createInputSurface()
-        player?.setSurface(inputSurface)
-        val render = FinalParentHopeItWorks(
-            this,
-            textureView.surfaceTexture,
-            inputSurface!!,
-            VIDEO_WIDTH,
-            VIDEO_HEIGHT
-        )
-        render.letsRun {
-            mediaCodec.start()
-            player?.start()
-        }
+    }
+
+    private fun playVideo() {
+
+    }
+
+    private fun renderIt() {
+        //  previewRenderer?.stopIt()
+
+        //  player?.setSurface(inputSurface)
+        /* val render = FinalParentHopeItWorks(
+             this,
+             textureView.surfaceTexture,
+             inputSurface!!,
+             VIDEO_WIDTH,
+             VIDEO_HEIGHT
+         )
+         render.letsRun {
+             mediaCodec.start()
+             player?.start()
+         }*/
         val bufferInfo = MediaCodec.BufferInfo()
 
         var isEOS = false
 
         isRendering = true
+        mediaCodec.start()
         val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         muxer.setOrientationHint(90)
         var trackIndex = muxer.addTrack(mediaCodec.outputFormat)
@@ -132,29 +141,32 @@ class TrialActivity : AppCompatActivity() {
             } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 trackIndex = muxer.addTrack(mediaCodec.outputFormat)
                 muxer.start()
+                logIt("Starting Muxer")
                 logIt("INFO_OUTPUT_FORMAT_CHANGED")
-            } else if (index < 0) {
-                logIt("Unexpected error")
-                break
             } else if (index >= 0) {
                 isVisited = true
                 val byteBuffer = mediaCodec.getOutputBuffer(index)
 
-                //        muxer.writeSampleData(trackIndex, byteBuffer!!, bufferInfo)
+                logIt("Adding in muxer")
+                muxer.writeSampleData(trackIndex, byteBuffer!!, bufferInfo)
                 mediaCodec.releaseOutputBuffer(index, true)
                 if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     isEOS = true
                 }
-            } else if (index == -1) {
+            } else {
+                logIt("NOTHING => $index")
                 if (isVisited && ++exitCounter == 20) {
+                    logIt("EXITING")
                     isEOS = true
+                    muxer.stop()
+                    muxer.release()
                     mediaCodec.stop()
                     mediaCodec.release()
                 }
             }
         }
-        /*  muxer.stop()
-          muxer.release()*/
+        logIt("OUT")
+
         /* RenderTask(
              this,
              textureView.surfaceTexture
