@@ -29,10 +29,11 @@ abstract class TextureSurfaceRenderer(
 
     private var thread: Thread? = null
 
-    fun letsRun() {
+    fun letsRun(callback: () -> Unit) {
         running = true
         thread = Thread(this)
         thread?.start()
+        callback()
     }
 
     fun stopIt() {
