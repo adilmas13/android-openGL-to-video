@@ -83,6 +83,20 @@ class HopeItCombinesActivity : AppCompatActivity() {
         )
     }
 
+
+    private fun release() {
+        egl.eglMakeCurrent(
+            eglDisplay,
+            EGL10.EGL_NO_SURFACE,
+            EGL10.EGL_NO_SURFACE,
+            EGL10.EGL_NO_CONTEXT
+        )
+        egl.eglDestroyContext(eglDisplay, eglContext)
+        egl.eglTerminate(eglDisplay)
+        eglDisplay = EGL10.EGL_NO_DISPLAY
+        eglContext = EGL10.EGL_NO_CONTEXT
+    }
+
     private fun chooseEglConfig(): EGLConfig? {
         val configsCount = IntArray(1)
         val configs: Array<EGLConfig?> = arrayOfNulls<EGLConfig>(1)
@@ -109,5 +123,10 @@ class HopeItCombinesActivity : AppCompatActivity() {
             EGL10.EGL_STENCIL_SIZE, 0,
             EGL10.EGL_NONE
         )
+    }
+
+    override fun onDestroy() {
+        release()
+        super.onDestroy()
     }
 }
