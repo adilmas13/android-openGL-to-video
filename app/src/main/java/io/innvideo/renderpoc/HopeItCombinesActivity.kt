@@ -2,6 +2,7 @@ package io.innvideo.renderpoc
 
 import android.graphics.SurfaceTexture
 import android.opengl.EGL14
+import android.opengl.GLES20
 import android.opengl.GLUtils
 import android.os.Bundle
 import android.view.Surface
@@ -40,8 +41,16 @@ class HopeItCombinesActivity : AppCompatActivity() {
     private fun bhaiChal(surfaceTexture: SurfaceTexture) {
         // STEP 1: INITIALIZE GL
         initializeGL()
-        // STEP 2 : Bind Surface with OpenGL
+        // STEP 2 : BIND SURFACE WITH OPEN GL
         bindSurfaceTextureToGL(surfaceTexture)
+        // STEP 3 : DRAW
+        draw(surfaceTexture)
+    }
+
+    private fun draw(surfaceTexture: SurfaceTexture) {
+        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        surfaceTexture.updateTexImage()
     }
 
     /*  1. Create a window surface by binding the textureView with GL
