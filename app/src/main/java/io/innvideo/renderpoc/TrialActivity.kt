@@ -11,6 +11,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.view.Surface
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
@@ -48,6 +49,7 @@ class TrialActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        playBtn.visibility = View.GONE
         playBtn.setOnClickListener { playVideo() }
         renderBtn.setOnClickListener { renderIt() }
     }
@@ -57,21 +59,20 @@ class TrialActivity : AppCompatActivity() {
             this.previewSurfaceTexture = surfaceTexture
             this.previewTextureHeight = height
             this.previewTextureWidth = width
+            previewRenderer = VideoTextureRenderer(
+                this@TrialActivity,
+                previewSurfaceTexture,
+                previewTextureWidth,
+                previewTextureHeight
+            )
+            previewRenderer?.letsRun {}
             this.player = MediaPlayer().apply {
-                previewRenderer = VideoTextureRenderer(
-                    this@TrialActivity,
-                    previewSurfaceTexture,
-                    previewTextureWidth,
-                    previewTextureHeight
-                )
                 setDataSource(INPUT_FILE)
-                player?.setSurface(Surface(previewRenderer?.getVideoTexture()))
+                setSurface(Surface(previewRenderer?.getVideoTexture()))
                 previewRenderer?.setVideoSize(this.videoWidth, this.videoHeight)
                 prepare()
                 setOnPreparedListener {
-                    previewRenderer?.letsRun {
-                        player?.start()
-                    }
+                    player?.start()
                 }
             }
         }
