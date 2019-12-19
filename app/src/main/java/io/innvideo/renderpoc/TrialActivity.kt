@@ -26,7 +26,6 @@ class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
 
     companion object {
         private val INPUT_FILE = "${Environment.getExternalStorageDirectory()}/aa/video.mp4"
-        private val OUTPUT_FILE = "${Environment.getExternalStorageDirectory()}/aa/v3.mp4"
 
         // Media Codec Properties
         private const val VIDEO_WIDTH = 640
@@ -84,7 +83,7 @@ class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         RenderTask(
             this,
             textureView.surfaceTexture
-        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+        ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getOutputFilePath())
     }
 
     var isRendering = false
@@ -103,8 +102,8 @@ class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
         private val context: Context,
         private val texture: SurfaceTexture
     ) :
-        AsyncTask<Void, Void, Boolean>() {
-        override fun doInBackground(vararg params: Void?): Boolean {
+        AsyncTask<String, Void, Boolean>() {
+        override fun doInBackground(vararg params: String): Boolean {
             val mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
             val format = MediaFormat.createVideoFormat(
                 MIME_TYPE,
@@ -139,7 +138,7 @@ class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             var isEOS = false
 
             isRendering = true
-            val muxer = MediaMuxer(OUTPUT_FILE, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val muxer = MediaMuxer(params[0], MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             muxer.setOrientationHint(90)
             var trackIndex = muxer.addTrack(mediaCodec.outputFormat)
 //            muxer.start()
@@ -183,4 +182,11 @@ class TrialActivity : AppCompatActivity(), TextureView.SurfaceTextureListener {
             super.onPostExecute(result)
         }
     }
+
+    private fun getOutputFilePath() =
+        resources.getString(
+            R.string.output_file_name,
+            Environment.getExternalStorageDirectory().absolutePath,
+            VideoUtils.getOutputName()
+        )
 }

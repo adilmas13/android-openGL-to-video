@@ -2,6 +2,8 @@ package io.innvideo.renderpoc
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
+import android.text.format.DateFormat
+import java.util.*
 
 
 object VideoUtils {
@@ -45,5 +47,11 @@ object VideoUtils {
             MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar -> true
             else -> false
         }
+    }
+
+    fun getOutputName(): String {
+        val cal = Calendar.getInstance(Locale.ENGLISH)
+        cal.timeInMillis = System.currentTimeMillis()
+        return "${DateFormat.format("dd_MMM_yyyy_hh_mm_ss_aaa", cal)}"
     }
 }
