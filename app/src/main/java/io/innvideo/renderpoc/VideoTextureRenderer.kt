@@ -237,5 +237,4 @@ class VideoTextureRenderer(
             logIt(op + ": glError " + GLUtils.getEGLErrorString(error))
         }
     }
-
 }

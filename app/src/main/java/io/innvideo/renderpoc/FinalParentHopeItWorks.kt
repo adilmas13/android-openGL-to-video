@@ -19,7 +19,7 @@ class FinalParentHopeItWorks(
     private var surface:Surface,
     private var myWidth: Int,
     private var myHeight: Int
-) : TextureSurfaceRenderer(texture, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
+) : TextureSurfaceRenderer(surface, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
 
     private val vertexShaderCode = "attribute vec4 vPosition;" +
             "attribute vec4 vTexCoordinate;" +
