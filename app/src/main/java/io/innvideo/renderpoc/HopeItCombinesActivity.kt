@@ -44,6 +44,10 @@ class HopeItCombinesActivity : AppCompatActivity() {
         bindSurfaceTextureToGL(surfaceTexture)
     }
 
+    /*  1. Create a window surface by binding the textureView with GL
+        2. Activate the new surface for drawing
+    * reference - https://www.androidcookbook.info/opengl-3d/associating-a-drawing-surface-with-opengl-es-through-the-egl-context.html
+    * */
     private fun bindSurfaceTextureToGL(surfaceTexture: SurfaceTexture) {
         // Step 1 : Bind GL with the surface texture to enable drawing
         eglSurface =
