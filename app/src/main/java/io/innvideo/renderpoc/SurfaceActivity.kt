@@ -495,12 +495,12 @@ val muxerBufferInfo = MediaCodec.BufferInfo()
             muxer.setOrientationHint(selectedTrack?.getInteger(MediaFormat.KEY_ROTATION) ?: 90)
             selectedTrack?.let { track ->
                 val trackIndex = muxer.addTrack(track)
-                val dstBuf = ByteBuffer.allocate(bufferSize)
+                val byteBuffer = ByteBuffer.allocate(bufferSize)
                 val bufferInfo = MediaCodec.BufferInfo()
                 muxer.start()
                 while (true) {
                     bufferInfo.offset = offset
-                    bufferInfo.size = mediaExtractor.readSampleData(dstBuf, offset)
+                    bufferInfo.size = mediaExtractor.readSampleData(byteBuffer, offset)
                     if (bufferInfo.size < 0) {
                         logIt("SAW END OF BUFFER")
                         toastIt("SAW END OF BUFFER")
@@ -509,7 +509,7 @@ val muxerBufferInfo = MediaCodec.BufferInfo()
                     bufferInfo.presentationTimeUs = mediaExtractor.sampleTime
                     bufferInfo.flags = mediaExtractor.sampleFlags
                     // val trackIndex = mediaExtractor.sampleTrackIndex
-                    muxer.writeSampleData(trackIndex, dstBuf, bufferInfo)
+                    muxer.writeSampleData(trackIndex, byteBuffer, bufferInfo)
                     mediaExtractor.advance()
                 }
             }

@@ -1,33 +1,36 @@
 package io.innvideo.renderpoc
 
 import android.graphics.SurfaceTexture
-import android.opengl.EGL14
+import android.media.MediaCodec
+import android.media.MediaCodecInfo
+import android.media.MediaFormat
+import android.media.MediaMuxer
 import android.opengl.GLES20
-import android.opengl.GLUtils
 import android.os.Bundle
-import android.view.Surface
+import android.os.Environment
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
-import java.nio.ShortBuffer
-import javax.microedition.khronos.egl.EGL10
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.egl.EGLContext
-import javax.microedition.khronos.egl.EGLDisplay
-import javax.microedition.khronos.egl.EGLSurface
 
 
 class HopeItCombinesActivity : AppCompatActivity() {
 
     private lateinit var surfaceTexture: SurfaceTexture
 
-    private lateinit var renderer: RendererBaba
+    private var renderer: RendererThread? = null
 
-    private lateinit var thread: Thread
+    companion object {
+        // Media Codec Properties
+        private const val VIDEO_WIDTH = 480
+        private const val VIDEO_HEIGHT = 640
+        private const val VIDEO_BITRATE = 5000000
+        private const val FRAME_INTERVAL = 5
+        private const val FPS = 30
+        private const val MAX_INPUT_SIZE = 0
+        private const val MIME_TYPE = "video/avc"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,167 +39,137 @@ class HopeItCombinesActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        btnRender.setOnClickListener { startRendering() }
         textureView.onSurfaceTextureAvailable { surfaceTexture, _, _ ->
-            renderer = RendererBaba(surfaceTexture)
-            thread = Thread(renderer)
-            thread.start()
+            /*renderer = RendererThread(surfaceTexture){}
+            renderer?.start()*/
             this.surfaceTexture = surfaceTexture
         }
     }
 
     override fun onDestroy() {
-        renderer.release()
-        thread.interrupt()
+        cancel()
         super.onDestroy()
     }
 
-    inner class RendererBaba(private val surfaceTexture: SurfaceTexture) : Runnable {
-
-        private lateinit var egl: EGL10
-        private lateinit var eglDisplay: EGLDisplay
-        private lateinit var eglContext: EGLContext
-        private lateinit var eglConfig: EGLConfig
-        private lateinit var eglSurface: EGLSurface
-
-        private var isRunning = false
-
-        private val VERTS = 3
-
-        //A raw native buffer to hold the point coordinates
-        private lateinit var mFVertexBuffer: FloatBuffer;
-
-        //A raw native buffer to hold indices //allowing a reuse of points.
-        private lateinit var mIndexBuffer: ShortBuffer;
-
-        init {
-            surfaceTexture.setOnFrameAvailableListener {
-                logIt("FRAME AVAILABLE")
-                surfaceTexture.updateTexImage()
-            }
+    private fun cancel() {
+        renderer?.let {
+            it.release()
+            it.interrupt()
         }
+    }
 
-        override fun run() {
-            logIt("=== STARTED ===")
-            initializeGL()
-            bindSurfaceTextureToGL()
-
-            val vbb: ByteBuffer = ByteBuffer.allocateDirect(VERTS * 3 * 4)
-            vbb.order(ByteOrder.nativeOrder());
-            mFVertexBuffer = vbb.asFloatBuffer()
-
-            val ibb = ByteBuffer.allocateDirect(VERTS * 2)
-
-            ibb.order(ByteOrder.nativeOrder())
-
-            mIndexBuffer = ibb.asShortBuffer()
-            val coords = floatArrayOf(
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.0f, 0.5f, 0.0f
-            )
-            for (i in 0 until VERTS) {
-                for (j in 0 until 3) {
-                    mFVertexBuffer.put(coords[i * 3 + j])
-                }
-            }
-            var myIndicesArray = shortArrayOf(0, 1, 2)
-            (0 until 3).forEach {
-                mIndexBuffer.put(myIndicesArray[it])
-            }
-            mFVertexBuffer.position(0)
-            mIndexBuffer.position(0)
-            isRunning = true
-            GLES20.glClearColor(0f, 0f, 0f, 1f)
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-            egl.eglSwapBuffers(eglDisplay, eglSurface)
-        }
-
-        /*  1. Create a window surface by binding the textureView with GL
-        2. Activate the new surface for drawing
-    * reference - https://www.androidcookbook.info/opengl-3d/associating-a-drawing-surface-with-opengl-es-through-the-egl-context.html
-    * */
-        private fun bindSurfaceTextureToGL() {
-            // Step 1 : Bind GL with the surface texture to enable drawing
-            eglSurface =
-                egl.eglCreateWindowSurface(eglDisplay, eglConfig, Surface(surfaceTexture), null)
-            // Step 2 : To activate drawing
-            val activated = egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
-            logIt("=== ACTIVE STATUE ===> ${activated}")
-        }
-
-        /*
-        *   1. Get an implementation of EGL10.
-            2. Get a display to use.
-            3. Initialize the display.
-            4. Specify a device-specific configuration to EGL.
-            5. Use an initialized display and a configuration to get an EGL context.
-            * Reference - https://www.androidcookbook.info/opengl-3d/getting-an-egl-context.html
-            * */
-        private fun initializeGL() {
-            // Step 1: get Egl Object
-            egl = EGLContext.getEGL() as EGL10
-            // Step 2: get instance of the egl display object
-            eglDisplay = egl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY)
-            // Step 3 : get initialize the display
-            egl.eglInitialize(eglDisplay, IntArray(2))
-            // Step 4 : Specify the config
-            eglConfig = chooseEglConfig()!!
-            // Step 5 : Create the context
-            eglContext = egl.eglCreateContext(
-                eglDisplay,
-                eglConfig,
-                EGL10.EGL_NO_CONTEXT,
-                intArrayOf(EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE)
-            )
-        }
-
-        fun release() {
-            logIt("=== RELEASING ===>")
-            isRunning = false
-            egl.eglMakeCurrent(
-                eglDisplay,
-                EGL10.EGL_NO_SURFACE,
-                EGL10.EGL_NO_SURFACE,
-                EGL10.EGL_NO_CONTEXT
-            )
-            egl.eglDestroyContext(eglDisplay, eglContext)
-            egl.eglTerminate(eglDisplay)
-            eglDisplay = EGL10.EGL_NO_DISPLAY
-            eglContext = EGL10.EGL_NO_CONTEXT
-        }
-
-        private fun chooseEglConfig(): EGLConfig? {
-            val configsCount = IntArray(1)
-            val configs: Array<EGLConfig?> = arrayOfNulls<EGLConfig>(1)
-            val configSpec = getConfig()
-            require(egl.eglChooseConfig(eglDisplay, configSpec, configs, 1, configsCount)) {
-                "Failed to choose config: " + GLUtils.getEGLErrorString(
-                    egl.eglGetError()
+    private fun startRendering() {
+        cancel()
+        val format = MediaFormat.createVideoFormat(
+            MIME_TYPE,
+            VIDEO_WIDTH,
+            VIDEO_HEIGHT
+        )
+            .apply {
+                setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, MAX_INPUT_SIZE)
+                setInteger(MediaFormat.KEY_BIT_RATE, VIDEO_BITRATE)
+                setInteger(MediaFormat.KEY_FRAME_RATE, FPS)
+                setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, FRAME_INTERVAL)
+                setInteger(
+                    MediaFormat.KEY_COLOR_FORMAT,
+                    MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
                 )
             }
-            return if (configsCount[0] > 0) {
-                configs[0]
-            } else null
-        }
+        val mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
+        mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        val inputSurface = mediaCodec.createInputSurface()
+        val thread = RendererThread(inputSurface) { mediaCodec.signalEndOfInputStream() }
+        val bufferInfo = MediaCodec.BufferInfo()
 
-        private fun getConfig(): IntArray {
-            return intArrayOf(
-                EGL10.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
-                EGL10.EGL_RED_SIZE, 8,
-                EGL10.EGL_GREEN_SIZE, 8,
-                EGL10.EGL_BLUE_SIZE, 8,
-                EGL10.EGL_ALPHA_SIZE, 8,
-                EGL10.EGL_DEPTH_SIZE, 0,
-                EGL10.EGL_STENCIL_SIZE, 0,
-                EGL10.EGL_NONE
-            )
-        }
+        mediaCodec.start()
+        thread.start()
+        val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        muxer.setOrientationHint(90)
+        var trackIndex = muxer.addTrack(mediaCodec.outputFormat)
+logIt("First track index => $trackIndex")
+        var isEOS = false
+        while (isEOS.not()) {
+            val index = mediaCodec.dequeueOutputBuffer(bufferInfo, 0)
+            if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                logIt("BUFFER CHANGED")
+            } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                trackIndex = muxer.addTrack(mediaCodec.outputFormat)
+                muxer.start()
+                logIt("Starting Muxer")
+                logIt("INFO_OUTPUT_FORMAT_CHANGED")
+            } else if (index >= 0) {
+                val byteBuffer = mediaCodec.getOutputBuffer(index)
+                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) { // The codec config data was pulled out and fed to the muxer when we got
+// the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
 
-        private fun draw() {
-            GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
+
+                    logIt("Setting Buffer info size")
+                    bufferInfo.size = 0
+                }
+                byteBuffer?.position(bufferInfo.offset)
+                byteBuffer?.limit(bufferInfo.offset + bufferInfo.size)
+                logIt("Adding in muxer => ${trackIndex} == buffer size => ${bufferInfo.size}")
+                muxer.writeSampleData(trackIndex, byteBuffer!!, bufferInfo)
+                mediaCodec.releaseOutputBuffer(index, false)
+                if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    isEOS = true
+                }
+            } else {
+                logIt("NOTHING => $index")
+            }
+        }
+        //      muxer.stop()
+        muxer.release()
+        mediaCodec.stop()
+        mediaCodec.release()
+        logIt("OUT")
+    }
+
+    private fun getOutputFilePath() =
+        resources.getString(
+            R.string.output_file_name,
+            Environment.getExternalStorageDirectory().absolutePath,
+            VideoUtils.getOutputName()
+        )
+}
+
+
+class RendererThread(surfaceTexture: Any, val completionListener: () -> Unit) :
+    Thread() {
+
+    private var isRunning = false
+
+    private var eglCore = EglCore(surfaceTexture)
+
+    override fun run() {
+        logIt("=== STARTED ===")
+        eglCore.init()
+        isRunning = true
+        var counter = 0
+        while (++counter < 20) {
+            val red = getRandom() / 255.0f
+            val green = getRandom() / 255.0f
+            val blue = getRandom() / 255.0f
+            GLES20.glClearColor(red, green, blue, 1.0f)
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+            eglCore.swapBuffer()
+            isRunning = false
+            sleep(500)
         }
+        completionListener()
+
 
     }
 
+    private fun getRandom() = (0..255).random();
+
+    fun release() {
+        isRunning = false
+        eglCore.release()
+    }
+
+    interface CompletionListener {
+        fun onCompleted()
+    }
 }
