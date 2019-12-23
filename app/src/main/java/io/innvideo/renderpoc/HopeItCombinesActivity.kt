@@ -28,7 +28,7 @@ class HopeItCombinesActivity : AppCompatActivity() {
         private const val FRAME_INTERVAL = 5
         private const val FPS = 30
         private const val MAX_INPUT_SIZE = 0
-        private const val MIME_TYPE = "video/avc"
+        private const val MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,14 +84,14 @@ class HopeItCombinesActivity : AppCompatActivity() {
         mediaCodec.start()
         thread.start()
         val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-         muxer.setOrientationHint(90)
+        muxer.setOrientationHint(90)
         var trackIndex = -1
         logIt("First track index => $trackIndex")
         var isEOS = false
         while (isEOS.not()) {
             val index = mediaCodec.dequeueOutputBuffer(bufferInfo, 0)
             if (index == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-                logIt("BUFFER CHANGED")
+                logIt("OUTPUT BUFFER CHANGED")
             } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 trackIndex = muxer.addTrack(mediaCodec.outputFormat)
                 muxer.start()
@@ -99,16 +99,15 @@ class HopeItCombinesActivity : AppCompatActivity() {
                 logIt("INFO_OUTPUT_FORMAT_CHANGED")
             } else if (index >= 0) {
                 val byteBuffer = mediaCodec.getOutputBuffer(index)
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) { // The codec config data was pulled out and fed to the muxer when we got
-// the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
-
-
+                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+                    // The codec config data was pulled out and fed to the muxer when we got
+                    // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
                     logIt("Setting Buffer info size")
                     bufferInfo.size = 0
                 }
                 byteBuffer?.position(bufferInfo.offset)
                 byteBuffer?.limit(bufferInfo.offset + bufferInfo.size)
-                logIt("Adding in muxer => ${trackIndex} == buffer size => ${bufferInfo.size}")
+                logIt("Adding in muxer => $trackIndex == buffer size => ${bufferInfo.size}")
                 muxer.writeSampleData(trackIndex, byteBuffer!!, bufferInfo)
                 mediaCodec.releaseOutputBuffer(index, false)
                 if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
