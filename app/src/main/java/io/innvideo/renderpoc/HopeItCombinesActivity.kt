@@ -84,7 +84,7 @@ class HopeItCombinesActivity : AppCompatActivity() {
         mediaCodec.start()
         thread.start()
         val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        // muxer.setOrientationHint(90)
+         muxer.setOrientationHint(90)
         var trackIndex = -1
         logIt("First track index => $trackIndex")
         var isEOS = false
@@ -157,8 +157,6 @@ class RendererThread(surfaceTexture: Any, val completionListener: () -> Unit) :
             sleep(500)
         }
         completionListener()
-
-
     }
 
     private fun getRandom() = (0..255).random();
