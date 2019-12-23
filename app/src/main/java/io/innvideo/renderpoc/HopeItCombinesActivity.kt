@@ -8,7 +8,6 @@ import android.media.MediaMuxer
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
@@ -23,9 +22,9 @@ class HopeItCombinesActivity : AppCompatActivity() {
 
     companion object {
         // Media Codec Properties
-        private const val VIDEO_WIDTH = 480
-        private const val VIDEO_HEIGHT = 640
-        private const val VIDEO_BITRATE = 5000000
+        private const val VIDEO_WIDTH = 320
+        private const val VIDEO_HEIGHT = 240
+        private const val VIDEO_BITRATE = 2000000
         private const val FRAME_INTERVAL = 5
         private const val FPS = 30
         private const val MAX_INPUT_SIZE = 0
@@ -85,9 +84,9 @@ class HopeItCombinesActivity : AppCompatActivity() {
         mediaCodec.start()
         thread.start()
         val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        muxer.setOrientationHint(90)
-        var trackIndex = muxer.addTrack(mediaCodec.outputFormat)
-logIt("First track index => $trackIndex")
+        // muxer.setOrientationHint(90)
+        var trackIndex = -1
+        logIt("First track index => $trackIndex")
         var isEOS = false
         while (isEOS.not()) {
             val index = mediaCodec.dequeueOutputBuffer(bufferInfo, 0)
@@ -119,7 +118,7 @@ logIt("First track index => $trackIndex")
                 logIt("NOTHING => $index")
             }
         }
-        //      muxer.stop()
+//              muxer.stop()
         muxer.release()
         mediaCodec.stop()
         mediaCodec.release()
