@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc
+package io.innvideo.renderpoc.poc
 
 class MediaUtils {
     companion object{

@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc
+package io.innvideo.renderpoc.poc
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
@@ -25,12 +25,16 @@ object VideoUtils {
     }
 
     fun selectColorFormat(mimeType: String): Int {
-        val codecInfo = selectCodec(mimeType)
+        val codecInfo =
+            selectCodec(mimeType)
         var colorFormat = 0
         val capabilities =
             codecInfo!!.getCapabilitiesForType(mimeType)
         for (i in capabilities.colorFormats.indices) {
-            if (isRecognizedFormat(capabilities.colorFormats[i])) {
+            if (isRecognizedFormat(
+                    capabilities.colorFormats[i]
+                )
+            ) {
                 colorFormat = capabilities.colorFormats[i]
                 break
             }

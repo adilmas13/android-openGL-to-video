@@ -1,8 +1,7 @@
-package io.innvideo.renderpoc
+package io.innvideo.renderpoc.poc
 
 import android.opengl.EGL14
 import android.opengl.GLUtils
-import android.view.Surface
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
@@ -22,6 +21,8 @@ class EglCore(private val surface: Any) {
         // 2: bind Surface to GL
         this.bindSurfaceTextureToGL()
     }
+
+    fun getEgl() = egl
 
     /*  1. Create a window surface by binding the textureView with GL
         2. Activate the new surface for drawing

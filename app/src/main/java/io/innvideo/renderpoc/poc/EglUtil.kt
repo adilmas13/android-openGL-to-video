@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc
+package io.innvideo.renderpoc.poc
 
 import android.opengl.EGL14
 import android.util.Log
