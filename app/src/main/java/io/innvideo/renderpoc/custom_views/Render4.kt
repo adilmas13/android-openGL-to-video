@@ -79,8 +79,9 @@ class Render4(val context: Context) : GLSurfaceView.Renderer {
             }
 
         fun draw() {
+            ELUtils.validateProgram(mProgram)
             // Add program to OpenGL ES environment
-            GLES20.glUseProgram(mProgram)
+            ELUtils.useProgram(mProgram)
 
             // get handle to vertex shader's vPosition member
             positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition").also {

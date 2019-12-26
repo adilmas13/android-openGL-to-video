@@ -3,6 +3,7 @@ package io.innvideo.renderpoc.gles.utils
 import android.opengl.GLES20.GL_COMPILE_STATUS
 import android.opengl.GLES20.GL_FRAGMENT_SHADER
 import android.opengl.GLES20.GL_LINK_STATUS
+import android.opengl.GLES20.GL_VALIDATE_STATUS
 import android.opengl.GLES20.GL_VERTEX_SHADER
 import android.opengl.GLES20.glAttachShader
 import android.opengl.GLES20.glCompileShader
@@ -16,6 +17,8 @@ import android.opengl.GLES20.glGetShaderInfoLog
 import android.opengl.GLES20.glGetShaderiv
 import android.opengl.GLES20.glLinkProgram
 import android.opengl.GLES20.glShaderSource
+import android.opengl.GLES20.glUseProgram
+import android.opengl.GLES20.glValidateProgram
 
 class ELUtils {
 
@@ -65,7 +68,7 @@ class ELUtils {
             }
 
 
-         fun createProgram(vararg shaders: Int): Int {
+        fun createProgram(vararg shaders: Int): Int {
             MyLogger.logIt("====== Started Program creation ======")
             val programObjectId = glCreateProgram()
             if (programObjectId == 0) {
@@ -90,6 +93,27 @@ class ELUtils {
                 glDeleteProgram(programObjectId)
             }
             return programObjectId
+        }
+
+        fun validateProgram(programObjectId: Int): Boolean {
+            MyLogger.logIt("===== Validating program ======")
+            glValidateProgram(programObjectId)
+            val validateStatus = IntArray(1)
+            glGetProgramiv(programObjectId, GL_VALIDATE_STATUS, validateStatus, 0)
+            val info = glGetProgramInfoLog(programObjectId)
+            MyLogger.logIt("Validation Status => $info")
+            return if (validateStatus[0] == 0) {
+                MyLogger.logIt("Program is not Valid")
+                false
+            } else {
+                MyLogger.logIt("Program is Valid")
+                true
+            }
+        }
+
+        fun useProgram(programObjectId:Int){
+            MyLogger.logIt("===== Using program ======")
+            glUseProgram(programObjectId)
         }
     }
 }
