@@ -1,13 +1,15 @@
 package io.innvideo.renderpoc.gles.utils
 
+import android.annotation.SuppressLint
 import android.util.Log
 
 class MyLogger {
 
     companion object {
         private const val LOG_TAG = "LOG_IT"
+        @SuppressLint("DefaultLocale")
         fun logIt(message: String) {
-            Log.d(LOG_TAG, message)
+            Log.d(LOG_TAG, message.toUpperCase())
         }
     }
 }

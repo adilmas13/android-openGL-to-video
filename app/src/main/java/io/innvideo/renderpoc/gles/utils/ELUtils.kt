@@ -2,12 +2,19 @@ package io.innvideo.renderpoc.gles.utils
 
 import android.opengl.GLES20.GL_COMPILE_STATUS
 import android.opengl.GLES20.GL_FRAGMENT_SHADER
+import android.opengl.GLES20.GL_LINK_STATUS
 import android.opengl.GLES20.GL_VERTEX_SHADER
+import android.opengl.GLES20.glAttachShader
 import android.opengl.GLES20.glCompileShader
+import android.opengl.GLES20.glCreateProgram
 import android.opengl.GLES20.glCreateShader
+import android.opengl.GLES20.glDeleteProgram
 import android.opengl.GLES20.glDeleteShader
+import android.opengl.GLES20.glGetProgramInfoLog
+import android.opengl.GLES20.glGetProgramiv
 import android.opengl.GLES20.glGetShaderInfoLog
 import android.opengl.GLES20.glGetShaderiv
+import android.opengl.GLES20.glLinkProgram
 import android.opengl.GLES20.glShaderSource
 
 class ELUtils {
@@ -56,5 +63,33 @@ class ELUtils {
                 GL_VERTEX_SHADER -> "GL_VERTEX_SHADER"
                 else -> "GL_FRAGMENT_SHADER"
             }
+
+
+         fun createProgram(vararg shaders: Int): Int {
+            MyLogger.logIt("====== Started Program creation ======")
+            val programObjectId = glCreateProgram()
+            if (programObjectId == 0) {
+                MyLogger.logIt("Could not create program")
+            }
+
+            shaders.forEach {
+                MyLogger.logIt("Attaching shader")
+                glAttachShader(programObjectId, it)
+            }
+            MyLogger.logIt("JOINING shaders to program")
+            glLinkProgram(programObjectId)
+
+            MyLogger.logIt("checking program linking status")
+            val linkStatus = IntArray(1)
+            glGetProgramiv(programObjectId, GL_LINK_STATUS, linkStatus, 0)
+            val info = glGetProgramInfoLog(programObjectId)
+            MyLogger.logIt("Program linking status => $info")
+            if (linkStatus[0] == 0) {
+                MyLogger.logIt("Program linking failed")
+                MyLogger.logIt("Deleting Failed program")
+                glDeleteProgram(programObjectId)
+            }
+            return programObjectId
+        }
     }
 }
