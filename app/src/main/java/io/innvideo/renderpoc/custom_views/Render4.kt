@@ -7,6 +7,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import io.innvideo.renderpoc.R
+import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.GLSLTextReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -27,7 +30,7 @@ class Render4(val context: Context) : GLSurfaceView.Renderer {
         )
     }
 
-    class Triangle {
+    class Triangle(val context: Context) {
 
         private var mProgram: Int = 0
         private var positionHandle: Int = 0
@@ -36,25 +39,21 @@ class Render4(val context: Context) : GLSurfaceView.Renderer {
         private val vertexCount: Int = triangleCoords.size / COORDS_PER_VERTEX
         private val vertexStride: Int = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
-
-        private val vertexShaderCode =
-            "attribute vec4 vPosition;" +
-                    "void main() {" +
-                    "  gl_Position = vPosition;" +
-                    "}"
-
-        private val fragmentShaderCode =
-            "precision mediump float;" +
-                    "uniform vec4 vColor;" +
-                    "void main() {" +
-                    "  gl_FragColor = vColor;" +
-                    "}"
-
         init {
 
 
-            val vertexShader: Int = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode)
-            val fragmentShader: Int = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode)
+            val vertexShader: Int = ELUtils.compileVertexShader(
+                GLSLTextReader.readGlslFromRawRes(
+                    context,
+                    R.raw.simple_vertex_shader
+                )
+            )
+            val fragmentShader: Int = ELUtils.compileFragmentShader(
+                GLSLTextReader.readGlslFromRawRes(
+                    context,
+                    R.raw.simple_fragment_shader
+                )
+            )
 
             // create empty OpenGL ES Program
             mProgram = GLES20.glCreateProgram().also {
@@ -147,7 +146,7 @@ class Render4(val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
 // initialize a triangle
-        mTriangle = Triangle()
+        mTriangle = Triangle(context)
     }
 
     fun drawableToBitmap(drawable: Drawable): Bitmap? {

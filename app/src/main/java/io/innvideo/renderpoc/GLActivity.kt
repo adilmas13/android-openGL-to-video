@@ -4,9 +4,6 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.custom_views.MyGLSurface
-import io.innvideo.renderpoc.custom_views.MyRenderer
-import io.innvideo.renderpoc.custom_views.Render2
-import io.innvideo.renderpoc.custom_views.Render3
 import io.innvideo.renderpoc.custom_views.Render4
 
 class GLActivity : AppCompatActivity() {
