@@ -11,12 +11,11 @@ import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.opengl.GLES20
-import android.opengl.GLUtils
 import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import io.innvideo.renderpoc.R
+import io.innvideo.renderpoc.gles.Triangle
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
@@ -218,42 +217,6 @@ class RendererThread(
         val green = getRandom() / 255.0f
         val blue = getRandom() / 255.0f
 
-        val bitmap = drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)
-        if (bitmap != null) {
-            val textures = IntArray(1)
-            GLES20.glGenTextures(1, textures, 0)
-            // bind the texture and set parameters
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0])
-            //Create Nearest Filtered Texture
-            GLES20.glTexParameteri(
-                GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_NEAREST
-            )
-            GLES20.glTexParameteri(
-                GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR
-            )
-
-            //Different possible texture parameters, e.g. GLES20.GL_CLAMP_TO_EDGE
-            GLES20.glTexParameteri(
-                GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_REPEAT
-            )
-            GLES20.glTexParameteri(
-                GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_REPEAT
-            )
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
-
-            bitmap.recycle()
-
-            GLES20.glClearColor(red, green, blue, 1.0f)
-            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-        }
 
 //            }
 
@@ -262,7 +225,9 @@ class RendererThread(
              setPosition(0 + counter, 0, 100, 100)
              setColor(1.0f, 0.0f, 1.0f, 1.0f)
          }*/
-
+        setColor(red, green, blue)
+        Triangle(context).draw()
+       //
         eglCore.swapBuffer()
         isRunning = false
         //    sleep(10)
