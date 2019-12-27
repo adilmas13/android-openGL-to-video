@@ -8,10 +8,25 @@ import io.innvideo.renderpoc.utils.logIt
 
 class RendererThread(
     surfaceTexture: Any,
-    private val list: List<Bitmap>? = null,
+    private val fullScreenVideoBitmapList: List<Bitmap>? = null,
+    private val smallVideoBitmapList: List<Bitmap>? = null,
     private val context: Context,
     val completionListener: () -> Unit
 ) : Thread() {
+
+    var vertexDataOne = floatArrayOf( // in counterclockwise order:
+        -1.0f, -1.0f, 0.0f,  // bottom left
+        1f, -1.0f, 0.0f,  // bottom right
+        -1.0f, 1.0f, 0.0f,  // top left
+        1.0f, 1.0f, 0.0f // top right
+    )
+
+    var vertexDataTwo = floatArrayOf( // in counterclockwise order:
+        0.0f, 0.0f, 0.0f,  // bottom left
+        1f, 0.0f, 0.0f,  // bottom right
+        0.0f, 1.0f, 0.0f,  // top left
+        1.0f, 1.0f, 0.0f // top right
+    )
 
     private var isRunning = false
 
@@ -26,10 +41,20 @@ class RendererThread(
         val green = getRandom() / 255.0f
         val blue = getRandom() / 255.0f
 
-        this.list?.forEach {
+        this.fullScreenVideoBitmapList?.forEachIndexed { index, bitmap ->
             setColor(red, green, blue)
-            BitmapTexture(context, it).onSurfaceCreated().draw()
+            BitmapTexture(context, vertexDataOne, bitmap).onSurfaceCreated().draw()
+            if(smallVideoBitmapList!!.size-1 != index) {
+                BitmapTexture(
+                    context,
+                    vertexDataTwo,
+                    smallVideoBitmapList!![index]
+                ).onSurfaceCreated()
+                    .draw()
+            }
             eglCore.swapBuffer()
+            smallVideoBitmapList!![index].recycle()
+            bitmap.recycle()
             sleep(20)
         }
         isRunning = false

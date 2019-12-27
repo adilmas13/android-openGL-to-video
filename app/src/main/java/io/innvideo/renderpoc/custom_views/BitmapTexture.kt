@@ -12,7 +12,11 @@ import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 
-class BitmapTexture(val context: Context, val bitmap: Bitmap) {
+class BitmapTexture(
+    val context: Context,
+    vertexData: FloatArray,
+    val bitmap: Bitmap
+) {
     private val vertexCount =
         vertexData.size / COORDS_PER_VERTEX
     //每一次取的总的点 大小
@@ -60,8 +64,8 @@ class BitmapTexture(val context: Context, val bitmap: Bitmap) {
                 GLES20.GL_TEXTURE_MAG_FILTER,
                 GLES20.GL_LINEAR
             )
-          /*  val bitmap =
-                ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)*/
+            /*  val bitmap =
+                  ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)*/
             //设置纹理为2d图片
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
         }
@@ -98,12 +102,12 @@ class BitmapTexture(val context: Context, val bitmap: Bitmap) {
 
     companion object {
         //顶点坐标
-        var vertexData = floatArrayOf( // in counterclockwise order:
-            -1.0f, -1.0f, 0.0f,  // bottom left
-            1f, -1.0f, 0.0f,  // bottom right
-            -1.0f, 1.0f, 0.0f,  // top left
-            1.0f, 1.0f, 0.0f // top right
-        )
+//        var vertexData = floatArrayOf( // in counterclockwise order:
+//            -1.0f, -1.0f, 0.0f,  // bottom left
+//            1f, -1.0f, 0.0f,  // bottom right
+//            -1.0f, 1.0f, 0.0f,  // top left
+//            1.0f, 1.0f, 0.0f // top right
+//        )
         //纹理坐标  对应顶点坐标  与之映射
         var textureData = floatArrayOf( // in counterclockwise order:
             0f, 1f, 0.0f,  // bottom left

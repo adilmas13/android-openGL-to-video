@@ -61,7 +61,7 @@ class RenderVideo(
         val thread =
             RendererThread(
                 inputSurface,
-                list = null,
+                fullScreenVideoBitmapList = null,
                 context = context
             ) { mediaCodec.signalEndOfInputStream() }
         val bufferInfo = MediaCodec.BufferInfo()
