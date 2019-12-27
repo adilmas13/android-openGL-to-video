@@ -220,14 +220,8 @@ class RendererThread(
 
 //            }
 
-        // create first object
-        /* createObject {
-             setPosition(0 + counter, 0, 100, 100)
-             setColor(1.0f, 0.0f, 1.0f, 1.0f)
-         }*/
         setColor(red, green, blue)
         Triangle(context).draw()
-       //
         eglCore.swapBuffer()
         isRunning = false
         //    sleep(10)

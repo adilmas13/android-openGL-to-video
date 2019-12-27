@@ -22,13 +22,13 @@ class Triangle(val context: Context) {
     init {
 
 
-        val vertexShader: Int = ELUtils.compileVertexShader(
+        val vertexShader: Int = ELUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.simple_vertex_shader
             )
         )
-        val fragmentShader: Int = ELUtils.compileFragmentShader(
+        val fragmentShader: Int = ELUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.simple_fragment_shader
