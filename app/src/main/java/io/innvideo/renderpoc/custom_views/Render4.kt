@@ -22,15 +22,6 @@ class Render4(val context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var mTriangle: Triangle
 
-    companion object {
-        const val COORDS_PER_VERTEX = 3
-        var triangleCoords = floatArrayOf(     // in counterclockwise order:
-            0.0f, 0.622008459f, 0.0f,      // top
-            -0.5f, -0.311004243f, 0.0f,    // bottom left
-            0.5f, -0.311004243f, 0.0f      // bottom right
-        )
-    }
-
     override fun onDrawFrame(gl: GL10) {
         mTriangle.draw()
     }

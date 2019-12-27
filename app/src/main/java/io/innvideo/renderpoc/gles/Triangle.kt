@@ -16,11 +16,19 @@ class Triangle(val context: Context) {
     private var positionHandle: Int = 0
     private var mColorHandle: Int = 0
 
-    private val vertexCount: Int = Render4.triangleCoords.size / Render4.COORDS_PER_VERTEX
-    private val vertexStride: Int = Render4.COORDS_PER_VERTEX * 4 // 4 bytes per vertex
+    companion object {
+        const val COORDS_PER_VERTEX = 3
+        var triangleCoords = floatArrayOf(     // in counterclockwise order:
+            0.0f, 0.622008459f, 0.0f,      // top
+            -0.5f, -0.311004243f, 0.0f,    // bottom left
+            0.5f, -0.311004243f, 0.0f      // bottom right
+        )
+    }
+
+    private val vertexCount: Int = triangleCoords.size / COORDS_PER_VERTEX
+    private val vertexStride: Int = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
     init {
-
 
         val vertexShader: Int = ELUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
@@ -45,14 +53,14 @@ class Triangle(val context: Context) {
 
     private var vertexBuffer: FloatBuffer =
         // (number of coordinate values * 4 bytes per float)
-        ByteBuffer.allocateDirect(Render4.triangleCoords.size * 4).run {
+        ByteBuffer.allocateDirect(triangleCoords.size * 4).run {
             // use the device hardware's native byte order
             order(ByteOrder.nativeOrder())
 
             // create a floating point buffer from the ByteBuffer
             asFloatBuffer().apply {
                 // add the coordinates to the FloatBuffer
-                put(Render4.triangleCoords)
+                put(triangleCoords)
                 // set the buffer to read the first coordinate
                 position(0)
             }
@@ -72,7 +80,7 @@ class Triangle(val context: Context) {
             // Prepare the triangle coordinate data
             GLES20.glVertexAttribPointer(
                 it,
-                Render4.COORDS_PER_VERTEX,
+                COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT,
                 false,
                 vertexStride,

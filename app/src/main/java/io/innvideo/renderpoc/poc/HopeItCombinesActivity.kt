@@ -2,26 +2,25 @@ package io.innvideo.renderpoc.poc
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.SurfaceTexture
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
+import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
 import android.opengl.GLES20
 import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.custom_views.BitmapTexture
+import io.innvideo.renderpoc.custom_views.TextTexture
 import io.innvideo.renderpoc.gles.Triangle
+import io.innvideo.renderpoc.gles.utils.ELUtils.Companion.drawableToBitmap
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 
 class HopeItCombinesActivity : AppCompatActivity() {
@@ -40,6 +39,7 @@ class HopeItCombinesActivity : AppCompatActivity() {
         private const val MAX_INPUT_SIZE = 0
         private const val MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC
         private val INPUT_FILE = "${Environment.getExternalStorageDirectory()}/aa/video.mp4"
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,14 +51,16 @@ class HopeItCombinesActivity : AppCompatActivity() {
     private fun init() {
         btnRender.setOnClickListener { startRendering() }
         textureView.onSurfaceTextureAvailable { surfaceTexture, _, _ ->
-            /* val metaMetaDataRetriever = MediaMetadataRetriever()
-             metaMetaDataRetriever.setDataSource(INPUT_FILE)
-             val bitmap = metaMetaDataRetriever.getFrameAtIndex(0)
-             val bitmap1 = drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)!!)
-             ivPreview.setImageBitmap(bitmap1)
-             metaMetaDataRetriever.release()*/
+            val metaMetaDataRetriever = MediaMetadataRetriever()
+            metaMetaDataRetriever.setDataSource(INPUT_FILE)
+
+            val bitmaps = metaMetaDataRetriever.getFramesAtIndex(0, 200)
+
+            val bitmap1 = drawableToBitmap(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)!!)
+            ivPreview.setImageBitmap(bitmaps[0])
+            metaMetaDataRetriever.release()
             renderer =
-                RendererThread(surfaceTexture, this) {}
+                RendererThread(surfaceTexture, list = bitmaps, context = this) {}
             renderer?.start()
             this.surfaceTexture = surfaceTexture
         }
@@ -109,7 +111,11 @@ class HopeItCombinesActivity : AppCompatActivity() {
         mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         val inputSurface = mediaCodec.createInputSurface()
         val thread =
-            RendererThread(inputSurface, this) { mediaCodec.signalEndOfInputStream() }
+            RendererThread(
+                inputSurface,
+                list = null,
+                context = this
+            ) { mediaCodec.signalEndOfInputStream() }
         val bufferInfo = MediaCodec.BufferInfo()
 
         mediaCodec.start()
@@ -166,47 +172,15 @@ class HopeItCombinesActivity : AppCompatActivity() {
 
 class RendererThread(
     surfaceTexture: Any,
+    val list: List<Bitmap>? = null,
     val context: Context,
     val completionListener: () -> Unit
 ) :
     Thread() {
 
-    private val VERTEX_COORDINATES = floatArrayOf(
-        -1.0f, +1.0f, 0.0f,
-        +1.0f, +1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        +1.0f, -1.0f, 0.0f
-    )
-
-    private val TEXTURE_COORDINATES = floatArrayOf(
-        0.0f, 0.0f,
-        1.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 1.0f
-    )
-
-    private val TEXCOORD_BUFFER = ByteBuffer.allocateDirect(TEXTURE_COORDINATES.size * 4)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer().put(TEXTURE_COORDINATES).rewind()
-    private val VERTEX_BUFFER = ByteBuffer.allocateDirect(VERTEX_COORDINATES.size * 4)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer().put(VERTEX_COORDINATES).rewind()
     private var isRunning = false
 
     private var eglCore = EglCore(surfaceTexture)
-
-    fun drawableToBitmap(drawable: Drawable): Bitmap? {
-        if (drawable is BitmapDrawable) {
-            return drawable.bitmap
-        }
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
-    }
 
     override fun run() {
         logIt("=== STARTED ===")
@@ -220,14 +194,15 @@ class RendererThread(
 
 
 //            }
-
-        setColor(red, green, blue)
-        Triangle(context).draw()
-        BitmapTexture(context).onSurfaceCreated().draw()
-
-        eglCore.swapBuffer()
+        this.list?.forEach {
+            setColor(red, green, blue)
+            Triangle(context).draw()
+            BitmapTexture(context, it).onSurfaceCreated().draw()
+            TextTexture(context, "Hello World").onSurfaceCreated().draw()
+            eglCore.swapBuffer()
+            sleep(20)
+        }
         isRunning = false
-        //    sleep(10)
         completionListener()
     }
 

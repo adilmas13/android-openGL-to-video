@@ -2,6 +2,8 @@ package io.innvideo.renderpoc.custom_views
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import android.util.Log
@@ -12,7 +14,7 @@ import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 
-class BitmapTexture(val context: Context, val bitmap: Bitmap) {
+class TextTexture(val context: Context, val text: String) {
     private val vertexCount =
         vertexData.size / COORDS_PER_VERTEX
     //每一次取的总的点 大小
@@ -28,7 +30,9 @@ class BitmapTexture(val context: Context, val bitmap: Bitmap) {
     //纹理id
     private var textureId = 0
 
-    fun onSurfaceCreated(): BitmapTexture {
+    private var bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_4444)
+
+    fun onSurfaceCreated(): TextTexture {
         val vertexSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.vertex_shader)
         val fragmentSource: String =
             GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
@@ -182,5 +186,21 @@ class BitmapTexture(val context: Context, val bitmap: Bitmap) {
             }
         }
         return program
+    }
+
+    init {
+        // get a canvas to paint over the bitmap
+        // get a canvas to paint over the bitmap
+        val canvas = Canvas(bitmap)
+        bitmap.eraseColor(0)
+        // Draw the text
+        // Draw the text
+        val textPaint = Paint()
+        textPaint.textSize = 32f
+        textPaint.isAntiAlias = true
+        textPaint.setARGB(0xff, 0x00, 0x00, 0x00)
+// draw the text centered
+        // draw the text centered
+        canvas.drawText(text, 16f, 112f, textPaint)
     }
 }
