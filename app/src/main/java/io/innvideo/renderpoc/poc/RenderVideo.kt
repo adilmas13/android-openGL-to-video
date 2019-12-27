@@ -1,6 +1,7 @@
 package io.innvideo.renderpoc.poc
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
@@ -12,7 +13,8 @@ import io.innvideo.renderpoc.poc.interfaces.RenderListener
 
 class RenderVideo(
     private val context: Context,
-    private val listener: RenderListener
+    private val fullScreenVideoBitmapList: List<Bitmap>? = null,
+    private val smallVideoBitmapList: List<Bitmap>? = null
 ) {
 
     companion object {
@@ -26,7 +28,6 @@ class RenderVideo(
     }
 
      fun startRendering() {
-        listener.cancel()
 
         val format = MediaFormat.createVideoFormat(
             MIME_TYPE,
@@ -61,7 +62,8 @@ class RenderVideo(
         val thread =
             RendererThread(
                 inputSurface,
-                fullScreenVideoBitmapList = null,
+                fullScreenVideoBitmapList = fullScreenVideoBitmapList,
+                smallVideoBitmapList = smallVideoBitmapList,
                 context = context
             ) { mediaCodec.signalEndOfInputStream() }
         val bufferInfo = MediaCodec.BufferInfo()

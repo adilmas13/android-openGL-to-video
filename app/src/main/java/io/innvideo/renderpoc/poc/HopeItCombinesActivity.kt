@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.model.Metadata
 import io.innvideo.renderpoc.poc.interfaces.RenderListener
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import kotlinx.android.synthetic.main.activity_hope_it_combines.*
@@ -32,15 +31,25 @@ class HopeItCombinesActivity : AppCompatActivity(), RenderListener {
     }
 
     private fun init() {
-        btnRender.setOnClickListener { RenderVideo(this, this).startRendering() }
+        btnRender.setOnClickListener {
+            RenderVideo(
+                this,
+                fetchBitmaps(INPUT_FILE),
+                fetchBitmaps(INPUT_FILE_1))
+                .startRendering()
+        }
         textureView.onSurfaceTextureAvailable { surfaceTexture, _, _ ->
 
             val fullScreenVideoBitmap = fetchBitmaps(INPUT_FILE)
             val smallScreenVideoBitmap = fetchBitmaps(INPUT_FILE_1)
 
             renderer =
-                RendererThread(surfaceTexture, fullScreenVideoBitmapList = fullScreenVideoBitmap,
-                    smallVideoBitmapList = smallScreenVideoBitmap, context = this) {}
+                RendererThread(
+                    surfaceTexture,
+                    fullScreenVideoBitmapList = fullScreenVideoBitmap,
+                    smallVideoBitmapList = smallScreenVideoBitmap,
+                    context = this
+                ) {}
             renderer?.start()
             this.surfaceTexture = surfaceTexture
         }

@@ -8,8 +8,8 @@ import io.innvideo.renderpoc.utils.logIt
 
 class RendererThread(
     surfaceTexture: Any,
-    private val fullScreenVideoBitmapList: List<Bitmap>? = null,
-    private val smallVideoBitmapList: List<Bitmap>? = null,
+    private var fullScreenVideoBitmapList: List<Bitmap>? = null,
+    private var smallVideoBitmapList: List<Bitmap>? = null,
     private val context: Context,
     val completionListener: () -> Unit
 ) : Thread() {
@@ -33,7 +33,6 @@ class RendererThread(
     private var eglCore = EglCore(surfaceTexture)
 
     override fun run() {
-        logIt("=== STARTED ===")
         eglCore.init()
         isRunning = true
 
@@ -57,8 +56,24 @@ class RendererThread(
             bitmap.recycle()
             sleep(20)
         }
+        clearAllBitmaps()
         isRunning = false
         completionListener()
+    }
+
+    private fun clearAllBitmaps() {
+        smallVideoBitmapList?.forEach {
+            if (it.isRecycled.not()){
+                it.recycle()
+            }
+        }
+        fullScreenVideoBitmapList?.forEach {
+            if (it.isRecycled.not()){
+                it.recycle()
+            }
+        }
+        smallVideoBitmapList = null
+        fullScreenVideoBitmapList = null
     }
 
     private fun setPosition(x: Int, y: Int, width: Int, height: Int) {
@@ -81,9 +96,5 @@ class RendererThread(
     fun release() {
         isRunning = false
         eglCore.release()
-    }
-
-    interface CompletionListener {
-        fun onCompleted()
     }
 }
