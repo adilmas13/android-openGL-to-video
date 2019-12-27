@@ -15,15 +15,16 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".poc.FramesExtractorActivity" />
-        <activity android:name=".poc.HopeItCombinesActivity" />
-        <activity android:name=".praveen.PraveenActivity" />
-        <activity android:name=".TrialActivity" />
-        <activity android:name=".GLActivity">
+        <activity android:name=".poc.HopeItCombinesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".praveen.PraveenActivity" />
+        <activity android:name=".TrialActivity" />
+        <activity android:name=".GLActivity">
         </activity>
         <activity android:name=".BasicActivity" />
         <activity android:name=".SurfaceActivity" />

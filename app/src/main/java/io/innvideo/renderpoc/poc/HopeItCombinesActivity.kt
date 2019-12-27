@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.R
+import io.innvideo.renderpoc.custom_views.BitmapTexture
 import io.innvideo.renderpoc.gles.Triangle
 import io.innvideo.renderpoc.utils.logIt
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
@@ -222,6 +223,8 @@ class RendererThread(
 
         setColor(red, green, blue)
         Triangle(context).draw()
+        BitmapTexture(context).onSurfaceCreated().draw()
+
         eglCore.swapBuffer()
         isRunning = false
         //    sleep(10)

@@ -29,7 +29,7 @@ class BitmapTexture(val context: Context) {
     //纹理id
     private var textureId = 0
 
-    fun onSurfaceCreated() {
+    fun onSurfaceCreated(): BitmapTexture {
         val vertexSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.vertex_shader)
         val fragmentSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
         program = createProgram(vertexSource, fragmentSource)
@@ -41,7 +41,7 @@ class BitmapTexture(val context: Context) {
             //创建纹理
             GLES20.glGenTextures(1, textureIds, 0)
             if (textureIds[0] == 0) {
-                return
+                return this
             }
             textureId = textureIds[0]
             //绑定纹理
@@ -64,6 +64,7 @@ class BitmapTexture(val context: Context) {
             //设置纹理为2d图片
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
         }
+        return this
     }
 
     fun draw() { //使用程序
@@ -97,10 +98,10 @@ class BitmapTexture(val context: Context) {
     companion object {
         //顶点坐标
         var vertexData = floatArrayOf( // in counterclockwise order:
-            -1f, -1f, 0.0f,  // bottom left
-            1f, -1f, 0.0f,  // bottom right
-            -1f, 1f, 0.0f,  // top left
-            1f, 1f, 0.0f
+            0.0f, 0.0f, 0.0f,  // bottom left
+            1f, 0.0f, 0.0f,  // bottom right
+            0.0f, 1.0f, 0.0f,  // top left
+            1.0f, 1.0f, 0.0f // top right
         )
         //纹理坐标  对应顶点坐标  与之映射
         var textureData = floatArrayOf( // in counterclockwise order:
