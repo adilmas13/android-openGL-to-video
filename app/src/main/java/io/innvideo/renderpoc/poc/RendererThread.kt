@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import io.innvideo.renderpoc.custom_views.BitmapTexture
-import io.innvideo.renderpoc.gles.Triangle
 import io.innvideo.renderpoc.utils.logIt
 
 class RendererThread(
@@ -29,7 +28,6 @@ class RendererThread(
 
         this.list?.forEach {
             setColor(red, green, blue)
-            Triangle(context).draw()
             BitmapTexture(context, it).onSurfaceCreated().draw()
             eglCore.swapBuffer()
             sleep(20)

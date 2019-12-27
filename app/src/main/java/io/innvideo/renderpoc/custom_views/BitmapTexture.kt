@@ -99,9 +99,9 @@ class BitmapTexture(val context: Context, val bitmap: Bitmap) {
     companion object {
         //顶点坐标
         var vertexData = floatArrayOf( // in counterclockwise order:
-            0.0f, 0.0f, 0.0f,  // bottom left
-            1f, 0.0f, 0.0f,  // bottom right
-            0.0f, 1.0f, 0.0f,  // top left
+            -1.0f, -1.0f, 0.0f,  // bottom left
+            1f, -1.0f, 0.0f,  // bottom right
+            -1.0f, 1.0f, 0.0f,  // top left
             1.0f, 1.0f, 0.0f // top right
         )
         //纹理坐标  对应顶点坐标  与之映射
