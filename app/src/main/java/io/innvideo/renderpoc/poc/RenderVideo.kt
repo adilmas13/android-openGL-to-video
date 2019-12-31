@@ -59,17 +59,17 @@ class RenderVideo(
         val mediaCodec = MediaCodec.createEncoderByType(MIME_TYPE)
         mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         val inputSurface = mediaCodec.createInputSurface()
-        val thread =
+      /*  val thread =
             RendererThread(
                 inputSurface,
                 fullScreenVideoBitmapList = fullScreenVideoBitmapList,
                 smallVideoBitmapList = smallVideoBitmapList,
                 context = context
-            ) { mediaCodec.signalEndOfInputStream() }
+            ) { mediaCodec.signalEndOfInputStream() }*/
         val bufferInfo = MediaCodec.BufferInfo()
 
         mediaCodec.start()
-        thread.start()
+       // thread.start()
         val muxer = MediaMuxer(getOutputFilePath(), MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         var trackIndex = -1
         logIt("First track index => $trackIndex")

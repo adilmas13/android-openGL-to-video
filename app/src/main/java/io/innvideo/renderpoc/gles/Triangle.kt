@@ -3,7 +3,6 @@ package io.innvideo.renderpoc.gles
 import android.content.Context
 import android.opengl.GLES20
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.custom_views.Render4
 import io.innvideo.renderpoc.gles.utils.ELUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
 import java.nio.ByteBuffer

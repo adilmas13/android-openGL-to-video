@@ -1,15 +1,12 @@
 package io.innvideo.renderpoc.poc
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.opengl.GLES20
-import io.innvideo.renderpoc.custom_views.BitmapTexture
-import io.innvideo.renderpoc.utils.logIt
+import io.innvideo.renderpoc.Layer
 
 class RendererThread(
     surfaceTexture: Any,
-    private var fullScreenVideoBitmapList: List<Bitmap>? = null,
-    private var smallVideoBitmapList: List<Bitmap>? = null,
+    private val layers: MutableList<Layer>,
     private val context: Context,
     val completionListener: () -> Unit
 ) : Thread() {
@@ -36,45 +33,22 @@ class RendererThread(
         eglCore.init()
         isRunning = true
 
-        val red = getRandom() / 255.0f
-        val green = getRandom() / 255.0f
-        val blue = getRandom() / 255.0f
-
-        this.fullScreenVideoBitmapList?.forEachIndexed { index, bitmap ->
-            setColor(red, green, blue)
-            BitmapTexture(context, vertexDataOne, bitmap).onSurfaceCreated().draw()
-            if(smallVideoBitmapList!!.size-1 != index) {
-                BitmapTexture(
-                    context,
-                    vertexDataTwo,
-                    smallVideoBitmapList!![index]
-                ).onSurfaceCreated()
-                    .draw()
-            }
-            eglCore.swapBuffer()
-            smallVideoBitmapList!![index].recycle()
-            bitmap.recycle()
-            sleep(20)
+        if (layers.hasBackground()) {
+            val layer = layers.getBackgroundLayer()
+            setColor(layer.red, layer.green, layer.blue, 1f)
         }
-        clearAllBitmaps()
+        eglCore.swapBuffer()
+        layers.forEach {
+
+
+        }
         isRunning = false
         completionListener()
     }
 
-    private fun clearAllBitmaps() {
-        smallVideoBitmapList?.forEach {
-            if (it.isRecycled.not()){
-                it.recycle()
-            }
-        }
-        fullScreenVideoBitmapList?.forEach {
-            if (it.isRecycled.not()){
-                it.recycle()
-            }
-        }
-        smallVideoBitmapList = null
-        fullScreenVideoBitmapList = null
-    }
+    private fun List<Layer>.hasBackground() = this.indexOfFirst { it is Layer.Background } > -1
+
+    private fun List<Layer>.getBackgroundLayer() = this.first { it is Layer.Background } as Layer.Background
 
     private fun setPosition(x: Int, y: Int, width: Int, height: Int) {
         GLES20.glScissor(x, y, width, height)
@@ -90,8 +64,6 @@ class RendererThread(
         callback()
         GLES20.glDisable(GLES20.GL_SCISSOR_TEST)
     }
-
-    private fun getRandom() = (0..255).random()
 
     fun release() {
         isRunning = false

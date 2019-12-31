@@ -25,13 +25,13 @@ import android.opengl.GLES20.glDeleteProgram
 import android.opengl.GLES20.glDeleteShader
 import android.opengl.GLES20.glGenTextures
 import android.opengl.GLES20.glGenerateMipmap
+import android.opengl.GLES20.glGetAttribLocation
 import android.opengl.GLES20.glGetProgramInfoLog
 import android.opengl.GLES20.glGetProgramiv
 import android.opengl.GLES20.glGetShaderInfoLog
 import android.opengl.GLES20.glGetShaderiv
 import android.opengl.GLES20.glLinkProgram
 import android.opengl.GLES20.glShaderSource
-import android.opengl.GLES20.glTexImage2D
 import android.opengl.GLES20.glTexParameteri
 import android.opengl.GLES20.glUseProgram
 import android.opengl.GLES20.glValidateProgram
@@ -87,6 +87,9 @@ class ELUtils {
                 else -> "GL_FRAGMENT_SHADER"
             }
 
+        fun deleteShader(shaderId: Int) {
+            glDeleteShader(shaderId)
+        }
 
         fun createProgram(vararg shaders: Int): Int {
             MyLogger.logIt("====== Started Program creation ======")
@@ -195,6 +198,15 @@ class ELUtils {
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
             return bitmap
+        }
+
+        fun getAttributeIndex(programId: Int, attribute: String, callback: (Int) -> Unit) {
+            val index = glGetAttribLocation(programId, attribute)
+            if (index > -1) {
+                callback(index)
+            }else{
+                MyLogger.logIt("Attribute not found => $attribute")
+            }
         }
     }
 }
