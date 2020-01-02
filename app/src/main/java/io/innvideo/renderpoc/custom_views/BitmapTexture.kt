@@ -34,8 +34,7 @@ class BitmapTexture(
 
     fun onSurfaceCreated(): BitmapTexture {
         val vertexSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.vertex_shader)
-        val fragmentSource: String =
-            GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
+        val fragmentSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
         program = createProgram(vertexSource, fragmentSource)
         if (program > 0) { //获取顶点坐标字段
             avPosition = GLES20.glGetAttribLocation(program, "av_Position")

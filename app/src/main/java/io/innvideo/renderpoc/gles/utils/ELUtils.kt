@@ -11,9 +11,12 @@ import android.opengl.GLES20.GL_FRAGMENT_SHADER
 import android.opengl.GLES20.GL_LINEAR
 import android.opengl.GLES20.GL_LINEAR_MIPMAP_LINEAR
 import android.opengl.GLES20.GL_LINK_STATUS
+import android.opengl.GLES20.GL_REPEAT
 import android.opengl.GLES20.GL_TEXTURE_2D
 import android.opengl.GLES20.GL_TEXTURE_MAG_FILTER
 import android.opengl.GLES20.GL_TEXTURE_MIN_FILTER
+import android.opengl.GLES20.GL_TEXTURE_WRAP_S
+import android.opengl.GLES20.GL_TEXTURE_WRAP_T
 import android.opengl.GLES20.GL_VALIDATE_STATUS
 import android.opengl.GLES20.GL_VERTEX_SHADER
 import android.opengl.GLES20.glAttachShader
@@ -139,7 +142,12 @@ class ELUtils {
             glUseProgram(programObjectId)
         }
 
-        fun createTexture(context: Context): Int {
+        fun deleteProgram(programObjectId: Int){
+            MyLogger.logIt("===== Deleting program ======")
+            glDeleteProgram(programObjectId)
+        }
+
+        fun createTexture(context: Context, @DrawableRes resourceId: Int): Int {
             MyLogger.logIt("====== Started texture creation ======")
             val textureObjectIds = IntArray(1)
             glGenTextures(
@@ -152,23 +160,26 @@ class ELUtils {
             } else {
                 MyLogger.logIt("texture created successfully")
             }
-
-            val bitmap =
-                drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.shape_rounded)!!)
-                    ?: throw RuntimeException("Bitmap is null")
-            MyLogger.logIt("Bitmap is not null")
             MyLogger.logIt("binding texture")
             glBindTexture(GL_TEXTURE_2D, textureObjectIds[0])
+
+            val bitmap =
+                drawableToBitmap(ContextCompat.getDrawable(context, resourceId)!!)
+                    ?: throw RuntimeException("Bitmap is null")
+            MyLogger.logIt("Bitmap is not null")
+
             MyLogger.logIt("Adding texture filtering")
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             MyLogger.logIt("Adding Bitmap to openGL")
             GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0)
             bitmap.recycle()
-            MyLogger.logIt("Generating mipmap")
-            glGenerateMipmap(GL_TEXTURE_2D)
-            MyLogger.logIt("Unbinding texture")
-            glBindTexture(GL_TEXTURE_2D, 0)
+           /* MyLogger.logIt("Generating mipmap")
+            glGenerateMipmap(GL_TEXTURE_2D)*/
+          /*  MyLogger.logIt("Unbinding texture")
+            glBindTexture(GL_TEXTURE_2D, 0)*/
             return textureObjectIds[0]
 
         }

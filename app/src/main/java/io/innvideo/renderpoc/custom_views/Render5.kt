@@ -6,6 +6,7 @@ import android.opengl.GLES20.GL_COLOR_BUFFER_BIT
 import android.opengl.GLES20.glClear
 import android.opengl.GLES20.glClearColor
 import android.opengl.GLSurfaceView
+import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.data.Image
 import io.innvideo.renderpoc.gles.utils.ELUtils
 import io.innvideo.renderpoc.gles.utils.TextureShaderProgram
@@ -46,7 +47,7 @@ class Render5(val context: Context) : GLSurfaceView.Renderer {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         image = Image()
         textureProgram = TextureShaderProgram(context)
-        texture = ELUtils.createTexture(context)
+        texture = ELUtils.createTexture(context, R.drawable.wall)
     }
 
 

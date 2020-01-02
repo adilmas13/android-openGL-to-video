@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.utils.ELUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
+import io.innvideo.renderpoc.gles.utils.MyLogger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig
@@ -22,7 +23,8 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
 
     companion object {
         private const val COORDS_PER_VERTEX = 3
-        private const val BYTES_PER_FLOAT = 4           // bytes per float is universal, can never change :P
+        private const val BYTES_PER_FLOAT =
+            4           // bytes per float is universal, can never change :P
         private var vertices = floatArrayOf(
             // positions
             0.5f, -0.5f, 0.0f,                        // bottom right
@@ -78,7 +80,7 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
         // Add program to OpenGL ES environment
         ELUtils.useProgram(programId)
 
-        ELUtils.getAttributeIndex(programId, "position") {index ->
+        ELUtils.getAttributeIndex(programId, "position") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -89,7 +91,7 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
                 vertexBuffer
             )
         }
-        ELUtils.getAttributeIndex(programId, "inputColor") {index ->
+        ELUtils.getAttributeIndex(programId, "inputColor") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -106,14 +108,14 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
         /*
   */
         // Prepare the triangle coordinate data
-       /* GLES20.glVertexAttribPointer(
-            0,
-            3,
-            GLES20.GL_FLOAT,
-            false,
-            vertexStride,
-            vertexBuffer
-        )*/
+        /* GLES20.glVertexAttribPointer(
+             0,
+             3,
+             GLES20.GL_FLOAT,
+             false,
+             vertexStride,
+             vertexBuffer
+         )*/
         // Draw the triangle
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
 
@@ -123,6 +125,7 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+        MyLogger.logIt("onSurfaceChanged")
         GLES20.glViewport(0, 0, width, height)
     }
 
