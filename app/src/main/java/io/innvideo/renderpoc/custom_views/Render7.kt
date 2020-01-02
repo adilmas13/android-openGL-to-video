@@ -3,6 +3,7 @@ package io.innvideo.renderpoc.custom_views
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import android.opengl.Matrix
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.utils.ELUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
@@ -20,6 +21,13 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
     private var programId = 0
     private var fragmentShaderId = 0
     private var vertexShaderId = 0
+
+    private val vPMatrix = FloatArray(16)
+    private val projectionMatrix = FloatArray(16)
+    private val viewMatrix = FloatArray(16)
+
+    // Use to access and set the view transformation
+    private var vPMatrixHandle: Int = 0
 
     companion object {
         private const val COORDS_PER_VERTEX = 3
@@ -76,6 +84,14 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
         }
 
     override fun onDrawFrame(gl: GL10) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        // Set the camera position (View matrix)
+        Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, -3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+
+        // Calculate the projection and view transformation
+        Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
+
+
         ELUtils.validateProgram(programId)
         // Add program to OpenGL ES environment
         ELUtils.useProgram(programId)
@@ -116,6 +132,12 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
              vertexStride,
              vertexBuffer
          )*/
+        // get handle to shape's transformation matrix
+        vPMatrixHandle = GLES20.glGetUniformLocation(programId, "uMVPMatrix")
+
+        // Pass the projection and view transformation to the shader
+        GLES20.glUniformMatrix4fv(vPMatrixHandle, 1, false, vPMatrix, 0)
+
         // Draw the triangle
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
 
@@ -125,11 +147,18 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        MyLogger.logIt("onSurfaceChanged")
+        MyLogger.logIt("onSurfaceChanged => width $width = height $height")
         GLES20.glViewport(0, 0, width, height)
+
+        val ratio: Float = width.toFloat() / height.toFloat()
+
+        // this projection matrix is applied to object coordinates
+        // in the onDrawFrame() method
+        Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f)
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
+        GLES20.glClearColor(1.0f, 0f, 0f, 1f)
         vertexShaderId = ELUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
