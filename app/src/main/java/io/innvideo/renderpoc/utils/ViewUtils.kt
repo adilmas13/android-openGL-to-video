@@ -2,6 +2,8 @@ package io.innvideo.renderpoc.utils
 
 import android.graphics.SurfaceTexture
 import android.view.TextureView
+import android.view.View
+import android.view.ViewTreeObserver
 
 fun TextureView.onSurfaceTextureAvailable(callback: (surfaceTexture: SurfaceTexture, width: Int, height: Int) -> Unit): TextureView.SurfaceTextureListener {
     val listener = object : TextureView.SurfaceTextureListener {
@@ -21,4 +23,15 @@ fun TextureView.onSurfaceTextureAvailable(callback: (surfaceTexture: SurfaceText
     }
     this.surfaceTextureListener = listener
     return listener
+}
+
+fun View.getWidthAndHeightAfterRender(callback: (Int, Int) -> Unit) {
+    viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            if (width > 0 && height > 0) {
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                callback(width, height)
+            }
+        }
+    })
 }

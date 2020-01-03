@@ -5,6 +5,9 @@ import android.opengl.GLES20
 import android.opengl.GLES20.GL_COLOR_BUFFER_BIT
 import android.opengl.GLES20.glClear
 import android.opengl.GLSurfaceView
+import androidx.core.content.ContextCompat
+import io.innvideo.renderpoc.R
+import io.innvideo.renderpoc.gles.utils.ELUtils
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -23,7 +26,7 @@ class Render6(val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         //  glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-      /*  bitmapTexture = BitmapTexture(context);
+      /*  bitmapTexture = BitmapTexture(context, ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.wall)!!)!!);
         bitmapTexture.onSurfaceCreated();*/
     }
 

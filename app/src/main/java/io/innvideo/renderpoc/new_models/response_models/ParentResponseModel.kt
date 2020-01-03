@@ -27,5 +27,7 @@ data class PositionResponseModel(
 data class ComponentResponseModel(
     @SerializedName("type") val type: String,
     @SerializedName("position") val position: PositionResponseModel,
-    @SerializedName("components") val components: List<ComponentResponseModel>
+    @SerializedName("components") val components: List<ComponentResponseModel>,
+    @SerializedName("text") val text: String?,
+    @SerializedName("url") val url: String?
 )

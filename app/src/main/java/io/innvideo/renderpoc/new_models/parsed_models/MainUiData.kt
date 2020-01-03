@@ -1,6 +1,7 @@
 package io.innvideo.renderpoc.new_models.parsed_models
 
-import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.Typeface
 import io.innvideo.renderpoc.new_models.response_models.PositionResponseModel
 
 class MainUiData {
@@ -13,7 +14,12 @@ class AudioData {
     var url = ""
 }
 
-class LayerData {
+sealed class LayerData {
+    class Image(val image: String, var bitmap: Bitmap? = null) : LayerData()
+    class Text(val text: String) : LayerData() {
+        var fontFamily: Typeface? = null
+    }
+
     companion object {
         private const val PER_VERTEX_SIZE = 3
         private const val NUMBER_OF_VERTICES = 4
@@ -39,8 +45,7 @@ class LayerData {
         topRight[0] = (-(0.5 - position.bottomX) * 2).toFloat()
         topRight[1] = ((0.5 - position.topY) * 2).toFloat()
 
-        coordinates = topLeft + bottomLeft + bottomRight + topRight
+        coordinates = bottomLeft + bottomRight + topLeft + topRight
 
-        Log.d("ARRAY", "ARRAY")
     }
 }

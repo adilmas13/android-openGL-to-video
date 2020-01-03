@@ -14,9 +14,10 @@ import java.nio.FloatBuffer
 
 class BitmapTexture(
     val context: Context,
-    vertexData: FloatArray,
+    val vertexData : FloatArray,
     val bitmap: Bitmap
 ) {
+
     private val vertexCount =
         vertexData.size / COORDS_PER_VERTEX
     //每一次取的总的点 大小
@@ -25,6 +26,39 @@ class BitmapTexture(
     private val vertexBuffer: FloatBuffer
     //纹理
     private val textureBuffer: FloatBuffer
+
+    init {
+        vertexBuffer = ByteBuffer.allocateDirect(vertexData.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+            .put(vertexData)
+        vertexBuffer.position(0)
+        textureBuffer = ByteBuffer.allocateDirect(textureData.size * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+            .put(textureData)
+        textureBuffer.position(0)
+    }
+
+    companion object {
+        //顶点坐标
+        var vertexData = floatArrayOf( // in counterclockwise order:
+            -1.0f, -1.0f, 0.0f,  // bottom left
+            1f, -1.0f, 0.0f,  // bottom right
+            -1.0f, 1.0f, 0.0f,  // top left
+            1.0f, 1.0f, 0.0f // top right
+        )
+        //纹理坐标  对应顶点坐标  与之映射
+        var textureData = floatArrayOf( // in counterclockwise order:
+            0f, 1f, 0.0f,  // bottom left
+            1f, 1f, 0.0f,  // bottom right
+            0f, 0f, 0.0f,  // top left
+            1f, 0f, 0.0f
+        )
+        //每一次取点的时候取几个点
+        const val COORDS_PER_VERTEX = 3
+    }
+
     private var program = 0
     private var avPosition = 0
     //纹理位置
@@ -97,38 +131,6 @@ class BitmapTexture(
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertexCount)
         GLES20.glDisableVertexAttribArray(avPosition)
         GLES20.glDisableVertexAttribArray(afPosition)
-    }
-
-    companion object {
-        //顶点坐标
-//        var vertexData = floatArrayOf( // in counterclockwise order:
-//            -1.0f, -1.0f, 0.0f,  // bottom left
-//            1f, -1.0f, 0.0f,  // bottom right
-//            -1.0f, 1.0f, 0.0f,  // top left
-//            1.0f, 1.0f, 0.0f // top right
-//        )
-        //纹理坐标  对应顶点坐标  与之映射
-        var textureData = floatArrayOf( // in counterclockwise order:
-            0f, 1f, 0.0f,  // bottom left
-            1f, 1f, 0.0f,  // bottom right
-            0f, 0f, 0.0f,  // top left
-            1f, 0f, 0.0f
-        )
-        //每一次取点的时候取几个点
-        const val COORDS_PER_VERTEX = 3
-    }
-
-    init {
-        vertexBuffer = ByteBuffer.allocateDirect(vertexData.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(vertexData)
-        vertexBuffer.position(0)
-        textureBuffer = ByteBuffer.allocateDirect(textureData.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(textureData)
-        textureBuffer.position(0)
     }
 
     fun loadShader(

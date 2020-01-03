@@ -3,20 +3,28 @@ package io.innvideo.renderpoc.custom_views
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import android.util.Log
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
+import io.innvideo.renderpoc.new_models.parsed_models.LayerData
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 
-class TextTexture(val context: Context, val text: String) {
-    private val vertexCount =
-        vertexData.size / COORDS_PER_VERTEX
+class TextTexture(
+    val context: Context,
+    val textData: LayerData.Text
+) {
+    private val vertexData: FloatArray = textData.coordinates
+
+    private val vertexCount = vertexData.size / COORDS_PER_VERTEX
     //每一次取的总的点 大小
     private val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
     //位置
@@ -30,7 +38,7 @@ class TextTexture(val context: Context, val text: String) {
     //纹理id
     private var textureId = 0
 
-    private var bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_4444)
+    private var textBitmap: Bitmap
 
     fun onSurfaceCreated(): TextTexture {
         val vertexSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.vertex_shader)
@@ -64,10 +72,10 @@ class TextTexture(val context: Context, val text: String) {
                 GLES20.GL_TEXTURE_MAG_FILTER,
                 GLES20.GL_LINEAR
             )
-          /*  val bitmap =
-                ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)*/
+            /*  val bitmap =
+                  ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)*/
             //设置纹理为2d图片
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, textBitmap, 0)
         }
         return this
     }
@@ -94,6 +102,10 @@ class TextTexture(val context: Context, val text: String) {
             vertexStride,
             textureBuffer
         )
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        //transpaency du bitmap+text !!!
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         //绘制 GLES20.GL_TRIANGLE_STRIP:复用坐标
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertexCount)
         GLES20.glDisableVertexAttribArray(avPosition)
@@ -101,13 +113,13 @@ class TextTexture(val context: Context, val text: String) {
     }
 
     companion object {
-        //顶点坐标
-        var vertexData = floatArrayOf( // in counterclockwise order:
-            0.0f, 0.0f, 0.0f,  // bottom left
-            1f, 0.0f, 0.0f,  // bottom right
-            0.0f, 1.0f, 0.0f,  // top left
-            1.0f, 1.0f, 0.0f // top right
-        )
+        /*  //顶点坐标
+          var vertexData = floatArrayOf( // in counterclockwise order:
+              0.0f, 0.0f, 0.0f,  // bottom left
+              1f, 0.0f, 0.0f,  // bottom right
+              0.0f, 1.0f, 0.0f,  // top left
+              1.0f, 1.0f, 0.0f // top right
+          )*/
         //纹理坐标  对应顶点坐标  与之映射
         var textureData = floatArrayOf( // in counterclockwise order:
             0f, 1f, 0.0f,  // bottom left
@@ -189,18 +201,30 @@ class TextTexture(val context: Context, val text: String) {
     }
 
     init {
-        // get a canvas to paint over the bitmap
-        // get a canvas to paint over the bitmap
-        val canvas = Canvas(bitmap)
-        bitmap.eraseColor(0)
-        // Draw the text
-        // Draw the text
-        val textPaint = Paint()
-        textPaint.textSize = 32f
-        textPaint.isAntiAlias = true
-        textPaint.setARGB(0xff, 0x00, 0x00, 0x00)
-// draw the text centered
-        // draw the text centered
-        canvas.drawText(text, 16f, 112f, textPaint)
+        val aFontSize = 50
+        val textPaint = Paint().apply {
+            textSize = aFontSize.toFloat()
+            isFakeBoldText = false
+            isAntiAlias = true
+            setARGB(255, 255, 255, 255)
+            isSubpixelText = true
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.SCREEN)
+            textData.fontFamily?.let { typeface -> setTypeface(typeface) }
+        }
+        val realTextWidth = textPaint.measureText(textData.text)
+        val bitmapWidth = (realTextWidth + 2f).toInt()
+        val bitmapHeight = aFontSize + 30
+        textBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+        textBitmap.eraseColor(Color.argb(0, 255, 255, 255))
+        val bitmapCanvas = Canvas(textBitmap)
+        bitmapCanvas.drawText(textData.text, 1f, 1.0f + aFontSize * 0.75f, textPaint);
+        /*  val canvas = Canvas(bitmap)
+
+          val textPaint = TextPaint()
+          textPaint.isAntiAlias = true
+          textPaint.bgColor = 255
+          textPaint.textSize = 20f
+          textPaint.setARGB(0xff, 0x00, 0x00, 0x00)
+          canvas.drawText(text, 0f, 20f, textPaint)*/
     }
 }
