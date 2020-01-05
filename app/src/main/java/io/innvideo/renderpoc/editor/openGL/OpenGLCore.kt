@@ -1,7 +1,8 @@
-package io.innvideo.renderpoc.poc
+package io.innvideo.renderpoc.editor.openGL
 
 import android.opengl.EGL14
 import android.opengl.GLUtils
+import io.innvideo.renderpoc.poc.EglUtil
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext

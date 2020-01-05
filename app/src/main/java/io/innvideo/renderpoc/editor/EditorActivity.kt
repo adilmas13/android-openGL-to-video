@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.gles
+package io.innvideo.renderpoc.editor
 
 import android.os.Bundle
 import android.view.View
@@ -12,8 +12,8 @@ import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
 import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
 import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseModel
+import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
-import io.innvideo.renderpoc.gles.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.utils.getWidthAndHeightAfterRender
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import io.innvideo.renderpoc.utils.toastIt
@@ -92,8 +92,17 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun setLayersOnScreen() {
-        val renderer = EditorRenderer(canvas.surfaceTexture, uiData.layers, this) {}
+        val renderer = EditorRenderer(
+            context = this,
+            surfaceTexture = canvas.surfaceTexture,
+            layers = uiData.layers,
+            completionListener = ::onRenderCompleted
+        )
         renderer.start()
+    }
+
+    private fun onRenderCompleted() {
+
     }
 
     private fun setCanvasDimension(width: Int, height: Int) {

@@ -3,6 +3,7 @@ package io.innvideo.renderpoc.poc
 import android.content.Context
 import android.opengl.GLES20
 import io.innvideo.renderpoc.Layer
+import io.innvideo.renderpoc.editor.openGL.OpenGLCore
 
 class RendererThread(
     surfaceTexture: Any,
@@ -27,7 +28,8 @@ class RendererThread(
 
     private var isRunning = false
 
-    private var eglCore = OpenGLCore(surfaceTexture)
+    private var eglCore =
+        OpenGLCore(surfaceTexture)
 
     override fun run() {
         eglCore.init()

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ccc"
-    tools:context=".gles.EditorActivity">
+    tools:context=".editor.EditorActivity">
 
     <TextureView
         android:id="@+id/canvas"
@@ -27,14 +27,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="hello"
-        android:layout_height="wrap_content"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

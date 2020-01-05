@@ -3,12 +3,12 @@ package io.innvideo.renderpoc.custom_views
 import android.content.Context
 import androidx.annotation.RawRes
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.GLSLTextReader.Companion.readGlslFromRawRes
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils.Companion.createFragmentShader
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils.Companion.createProgram
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils.Companion.createVertexShader
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils.Companion.useProgram
+import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils.Companion.createFragmentShader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils.Companion.createProgram
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils.Companion.createVertexShader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils.Companion.useProgram
 
 class OpenGLProgram(
     context: Context,

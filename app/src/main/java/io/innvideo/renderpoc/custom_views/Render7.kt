@@ -5,9 +5,9 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.OpenGLUtils
-import io.innvideo.renderpoc.gles.utils.GLSLTextReader
-import io.innvideo.renderpoc.gles.utils.OpenGLLogger
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
+import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLLogger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig

@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.gles.utils
+package io.innvideo.renderpoc.editor.openGL.utils
 
 import android.content.Context
 import android.content.res.Resources

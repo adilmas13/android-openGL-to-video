@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.custom_views
+package io.innvideo.renderpoc.editor.openGL.textures
 
 import android.content.Context
 import android.graphics.Bitmap

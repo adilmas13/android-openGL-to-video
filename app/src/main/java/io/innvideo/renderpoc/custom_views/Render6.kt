@@ -5,6 +5,7 @@ import android.opengl.GLES20
 import android.opengl.GLES20.GL_COLOR_BUFFER_BIT
 import android.opengl.GLES20.glClear
 import android.opengl.GLSurfaceView
+import io.innvideo.renderpoc.editor.openGL.textures.ImageTexture
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

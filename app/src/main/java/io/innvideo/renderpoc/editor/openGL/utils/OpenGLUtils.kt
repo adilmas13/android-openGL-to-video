@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.gles.utils
+package io.innvideo.renderpoc.editor.openGL.utils
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -43,13 +43,22 @@ class OpenGLUtils {
 
     companion object {
         fun createVertexShader(shaderCode: String) =
-            compileShader(GL_VERTEX_SHADER, shaderCode)
+            compileShader(
+                GL_VERTEX_SHADER,
+                shaderCode
+            )
 
         fun createFragmentShader(shaderCode: String) =
-            compileShader(GL_FRAGMENT_SHADER, shaderCode)
+            compileShader(
+                GL_FRAGMENT_SHADER,
+                shaderCode
+            )
 
         private fun compileShader(type: Int, shaderCode: String): Int {
-            val shaderName = getShaderNameUsingType(type)
+            val shaderName =
+                getShaderNameUsingType(
+                    type
+                )
             OpenGLLogger.logIt("====== $shaderName STARTED ======")
             OpenGLLogger.logIt("CREATING SHADER OBJECT =>")
             val shaderObjectId = glCreateShader(type) // GLES to create a new shader object
@@ -160,7 +169,9 @@ class OpenGLUtils {
             glBindTexture(GL_TEXTURE_2D, textureObjectIds[0])
 
             val bitmap =
-                drawableToBitmap(ContextCompat.getDrawable(context, resourceId)!!)
+                drawableToBitmap(
+                    ContextCompat.getDrawable(context, resourceId)!!
+                )
                     ?: throw RuntimeException("Bitmap is null")
             OpenGLLogger.logIt("Bitmap is not null")
 

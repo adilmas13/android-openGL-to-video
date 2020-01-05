@@ -2,6 +2,8 @@ package io.innvideo.renderpoc.gles.utils
 
 import android.content.Context
 import android.opengl.GLES20
+import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
 
 open class ShaderProgram(
     context: Context,

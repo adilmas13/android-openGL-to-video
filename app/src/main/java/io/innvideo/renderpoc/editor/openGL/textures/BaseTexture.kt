@@ -1,10 +1,11 @@
-package io.innvideo.renderpoc.custom_views
+package io.innvideo.renderpoc.editor.openGL.textures
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import io.innvideo.renderpoc.R
+import io.innvideo.renderpoc.custom_views.OpenGLProgram
 import io.innvideo.renderpoc.editor.constants.OpenGLConstants.FLOAT_SIZE_IN_BYTES
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -59,7 +60,11 @@ abstract class BaseTexture(
     private lateinit var program: OpenGLProgram
 
     private fun initialise(): BaseTexture {
-        program = OpenGLProgram(context, R.raw.vertex_shader, R.raw.fragment_shader)
+        program = OpenGLProgram(
+            context,
+            R.raw.vertex_shader,
+            R.raw.fragment_shader
+        )
         if (program.programId > 0) {
             avPosition = GLES20.glGetAttribLocation(program.programId, "av_Position")
             afPosition = GLES20.glGetAttribLocation(program.programId, "af_Position")
