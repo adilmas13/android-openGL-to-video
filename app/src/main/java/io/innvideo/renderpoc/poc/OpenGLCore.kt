@@ -8,7 +8,7 @@ import javax.microedition.khronos.egl.EGLContext
 import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.egl.EGLSurface
 
-class EglCore(private val surface: Any) {
+class OpenGLCore(private val surface: Any) {
     private lateinit var egl: EGL10
     private lateinit var eglDisplay: EGLDisplay
     private lateinit var eglContext: EGLContext

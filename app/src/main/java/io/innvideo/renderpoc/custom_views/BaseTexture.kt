@@ -11,27 +11,25 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
-
-class BitmapTexture(
-    val context: Context,
-    val vertexData : FloatArray,
-    val bitmap: Bitmap
+abstract class BaseTexture(
+    private val context: Context,
+    vertexData: FloatArray
 ) {
 
-    private val vertexCount =
-        vertexData.size / COORDS_PER_VERTEX
+    abstract fun getBitmap(): Bitmap
+
+    private val vertexCount = vertexData.size / COORDS_PER_VERTEX
     //每一次取的总的点 大小
     private val vertexStride = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
     //位置
-    private val vertexBuffer: FloatBuffer
+    private val vertexBuffer = ByteBuffer.allocateDirect(vertexData.size * 4)
+        .order(ByteOrder.nativeOrder())
+        .asFloatBuffer()
+        .put(vertexData)
     //纹理
     private val textureBuffer: FloatBuffer
 
     init {
-        vertexBuffer = ByteBuffer.allocateDirect(vertexData.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(vertexData)
         vertexBuffer.position(0)
         textureBuffer = ByteBuffer.allocateDirect(textureData.size * 4)
             .order(ByteOrder.nativeOrder())
@@ -66,9 +64,10 @@ class BitmapTexture(
     //纹理id
     private var textureId = 0
 
-    fun onSurfaceCreated(): BitmapTexture {
+    private fun initialise(): BaseTexture {
         val vertexSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.vertex_shader)
-        val fragmentSource: String = GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
+        val fragmentSource: String =
+            GLSLTextReader.readGlslFromRawRes(context, R.raw.fragment_shader)
         program = createProgram(vertexSource, fragmentSource)
         if (program > 0) { //获取顶点坐标字段
             avPosition = GLES20.glGetAttribLocation(program, "av_Position")
@@ -84,8 +83,16 @@ class BitmapTexture(
             //绑定纹理
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
             //环绕（超出纹理坐标范围）  （s==x t==y GL_REPEAT 重复）
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
+            GLES20.glTexParameteri(
+                GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_WRAP_S,
+                GLES20.GL_CLAMP_TO_EDGE
+            )
+            GLES20.glTexParameteri(
+                GLES20.GL_TEXTURE_2D,
+                GLES20.GL_TEXTURE_WRAP_T,
+                GLES20.GL_CLAMP_TO_EDGE
+            )
             //过滤（纹理像素映射到坐标点）  （缩小、放大：GL_LINEAR线性）
             GLES20.glTexParameteri(
                 GLES20.GL_TEXTURE_2D,
@@ -100,12 +107,13 @@ class BitmapTexture(
             /*  val bitmap =
                   ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)!!)*/
             //设置纹理为2d图片
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, getBitmap(), 0)
         }
         return this
     }
 
     fun draw() { //使用程序
+        initialise()
         GLES20.glUseProgram(program)
         GLES20.glEnableVertexAttribArray(avPosition)
         GLES20.glEnableVertexAttribArray(afPosition)
@@ -127,6 +135,10 @@ class BitmapTexture(
             vertexStride,
             textureBuffer
         )
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        //transpaency du bitmap+text !!!
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
         //绘制 GLES20.GL_TRIANGLE_STRIP:复用坐标
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertexCount)
         GLES20.glDisableVertexAttribArray(avPosition)
@@ -177,10 +189,10 @@ class BitmapTexture(
             GLES20.glAttachShader(program, fragmentShader)
             //关联为可执行渲染程序
             GLES20.glLinkProgram(program)
-            val linsStatus = IntArray(1)
+            val linkStatus = IntArray(1)
             //检测是否关联成功
-            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linsStatus, 0)
-            if (linsStatus[0] != GLES20.GL_TRUE) {
+            GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0)
+            if (linkStatus[0] != GLES20.GL_TRUE) {
                 Log.d("LOG_IT", "link program error")
                 GLES20.glDeleteProgram(program)
                 program = 0
@@ -188,4 +200,5 @@ class BitmapTexture(
         }
         return program
     }
+
 }

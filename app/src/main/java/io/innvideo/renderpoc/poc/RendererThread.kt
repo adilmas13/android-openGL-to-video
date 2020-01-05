@@ -27,7 +27,7 @@ class RendererThread(
 
     private var isRunning = false
 
-    private var eglCore = EglCore(surfaceTexture)
+    private var eglCore = OpenGLCore(surfaceTexture)
 
     override fun run() {
         eglCore.init()

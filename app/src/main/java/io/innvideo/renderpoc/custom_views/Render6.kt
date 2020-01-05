@@ -5,15 +5,12 @@ import android.opengl.GLES20
 import android.opengl.GLES20.GL_COLOR_BUFFER_BIT
 import android.opengl.GLES20.glClear
 import android.opengl.GLSurfaceView
-import androidx.core.content.ContextCompat
-import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.ELUtils
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 
 class Render6(val context: Context) : GLSurfaceView.Renderer {
-    private lateinit var bitmapTexture: BitmapTexture
+    private lateinit var bitmapTexture: ImageTexture
 
     override fun onDrawFrame(gl: GL10) {
         glClear(GL_COLOR_BUFFER_BIT)
