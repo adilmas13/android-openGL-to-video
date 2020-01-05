@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.custom_views
+package io.innvideo.renderpoc.editor.openGL.program
 
 import android.content.Context
 import androidx.annotation.RawRes

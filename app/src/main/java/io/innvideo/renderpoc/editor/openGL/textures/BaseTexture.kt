@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.opengl.GLES20
 import android.opengl.GLUtils
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.custom_views.OpenGLProgram
-import io.innvideo.renderpoc.editor.constants.OpenGLConstants.FLOAT_SIZE_IN_BYTES
+import io.innvideo.renderpoc.editor.openGL.program.OpenGLProgram
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLConstants.FLOAT_SIZE_IN_BYTES
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
