@@ -2,14 +2,12 @@ package io.innvideo.renderpoc.gles.utils
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.opengl.GLES20.GL_COMPILE_STATUS
 import android.opengl.GLES20.GL_FRAGMENT_SHADER
 import android.opengl.GLES20.GL_LINEAR
-import android.opengl.GLES20.GL_LINEAR_MIPMAP_LINEAR
 import android.opengl.GLES20.GL_LINK_STATUS
 import android.opengl.GLES20.GL_REPEAT
 import android.opengl.GLES20.GL_TEXTURE_2D
@@ -27,7 +25,6 @@ import android.opengl.GLES20.glCreateShader
 import android.opengl.GLES20.glDeleteProgram
 import android.opengl.GLES20.glDeleteShader
 import android.opengl.GLES20.glGenTextures
-import android.opengl.GLES20.glGenerateMipmap
 import android.opengl.GLES20.glGetAttribLocation
 import android.opengl.GLES20.glGetProgramInfoLog
 import android.opengl.GLES20.glGetProgramiv
@@ -41,9 +38,8 @@ import android.opengl.GLES20.glValidateProgram
 import android.opengl.GLUtils
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import io.innvideo.renderpoc.R
 
-class ELUtils {
+class OpenGLUtils {
 
     companion object {
         fun createVertexShader(shaderCode: String) =
@@ -54,33 +50,33 @@ class ELUtils {
 
         private fun compileShader(type: Int, shaderCode: String): Int {
             val shaderName = getShaderNameUsingType(type)
-            MyLogger.logIt("====== $shaderName STARTED ======")
-            MyLogger.logIt("CREATING SHADER OBJECT =>")
+            OpenGLLogger.logIt("====== $shaderName STARTED ======")
+            OpenGLLogger.logIt("CREATING SHADER OBJECT =>")
             val shaderObjectId = glCreateShader(type) // GLES to create a new shader object
             if (shaderObjectId == 0) {
-                MyLogger.logIt("UNABLE TO CREATE SHADER OBJECT")
+                OpenGLLogger.logIt("UNABLE TO CREATE SHADER OBJECT")
             }
             // getting shader source : LINKING received shader object with shader code
-            MyLogger.logIt("GETTING SHADER SOURCE")
+            OpenGLLogger.logIt("GETTING SHADER SOURCE")
             glShaderSource(shaderObjectId, shaderCode)          // GLES
             // compiling shader
-            MyLogger.logIt("COMPILING SHADER")
+            OpenGLLogger.logIt("COMPILING SHADER")
             glCompileShader(shaderObjectId)                     // GLES
             // checking compile status
-            MyLogger.logIt("GETTING COMPILATION STATUS")
+            OpenGLLogger.logIt("GETTING COMPILATION STATUS")
             val compileStatus = IntArray(1)
             glGetShaderiv(shaderObjectId, GL_COMPILE_STATUS, compileStatus, 0)  // GLES
             val info = glGetShaderInfoLog(shaderObjectId)
-            MyLogger.logIt("SHADER COMPILED INFO => $info")
+            OpenGLLogger.logIt("SHADER COMPILED INFO => $info")
             if (compileStatus[0] == 0) {
-                MyLogger.logIt("SHADER COMPILATION FAILED")
-                MyLogger.logIt("DELETING FAILED SHADER OBJECT")
+                OpenGLLogger.logIt("SHADER COMPILATION FAILED")
+                OpenGLLogger.logIt("DELETING FAILED SHADER OBJECT")
                 glDeleteShader(shaderObjectId)
                 return 0
             } else {
-                MyLogger.logIt("SHADER COMPILATION SUCCESS")
+                OpenGLLogger.logIt("SHADER COMPILATION SUCCESS")
             }
-            MyLogger.logIt("====== $shaderName ENDED ======")
+            OpenGLLogger.logIt("====== $shaderName ENDED ======")
             return shaderObjectId
         }
 
@@ -95,60 +91,60 @@ class ELUtils {
         }
 
         fun createProgram(vararg shaders: Int): Int {
-            MyLogger.logIt("====== Started Program creation ======")
+            OpenGLLogger.logIt("====== Started Program creation ======")
             val programObjectId = glCreateProgram()
             if (programObjectId == 0) {
-                MyLogger.logIt("Could not create program")
+                OpenGLLogger.logIt("Could not create program")
             }
 
             shaders.forEach {
-                MyLogger.logIt("Attaching shader")
+                OpenGLLogger.logIt("Attaching shader")
                 glAttachShader(programObjectId, it)
             }
-            MyLogger.logIt("JOINING shaders to program")
+            OpenGLLogger.logIt("JOINING shaders to program")
             glLinkProgram(programObjectId)
 
-            MyLogger.logIt("checking program linking status")
+            OpenGLLogger.logIt("checking program linking status")
             val linkStatus = IntArray(1)
             glGetProgramiv(programObjectId, GL_LINK_STATUS, linkStatus, 0)
             val info = glGetProgramInfoLog(programObjectId)
-            MyLogger.logIt("Program linking status => $info")
+            OpenGLLogger.logIt("Program linking status => $info")
             if (linkStatus[0] == 0) {
-                MyLogger.logIt("Program linking failed")
-                MyLogger.logIt("Deleting Failed program")
+                OpenGLLogger.logIt("Program linking failed")
+                OpenGLLogger.logIt("Deleting Failed program")
                 glDeleteProgram(programObjectId)
             }
             return programObjectId
         }
 
         fun validateProgram(programObjectId: Int): Boolean {
-            MyLogger.logIt("===== Validating program ======")
+            OpenGLLogger.logIt("===== Validating program ======")
             glValidateProgram(programObjectId)
             val validateStatus = IntArray(1)
             glGetProgramiv(programObjectId, GL_VALIDATE_STATUS, validateStatus, 0)
             val info = glGetProgramInfoLog(programObjectId)
-            MyLogger.logIt("Validation Status => $info")
+            OpenGLLogger.logIt("Validation Status => $info")
             return if (validateStatus[0] == 0) {
-                MyLogger.logIt("Program is not Valid")
+                OpenGLLogger.logIt("Program is not Valid")
                 false
             } else {
-                MyLogger.logIt("Program is Valid")
+                OpenGLLogger.logIt("Program is Valid")
                 true
             }
         }
 
         fun useProgram(programObjectId: Int) {
-            MyLogger.logIt("===== Using program ======")
+            OpenGLLogger.logIt("===== Using program ======")
             glUseProgram(programObjectId)
         }
 
-        fun deleteProgram(programObjectId: Int){
-            MyLogger.logIt("===== Deleting program ======")
+        fun deleteProgram(programObjectId: Int) {
+            OpenGLLogger.logIt("===== Deleting program ======")
             glDeleteProgram(programObjectId)
         }
 
         fun createTexture(context: Context, @DrawableRes resourceId: Int): Int {
-            MyLogger.logIt("====== Started texture creation ======")
+            OpenGLLogger.logIt("====== Started texture creation ======")
             val textureObjectIds = IntArray(1)
             glGenTextures(
                 1,
@@ -156,44 +152,32 @@ class ELUtils {
                 0
             ) // we pass one since we want to create only one texture
             if (textureObjectIds[0] == 0) {
-                MyLogger.logIt("texture creation Failed")
+                OpenGLLogger.logIt("texture creation Failed")
             } else {
-                MyLogger.logIt("texture created successfully")
+                OpenGLLogger.logIt("texture created successfully")
             }
-            MyLogger.logIt("binding texture")
+            OpenGLLogger.logIt("binding texture")
             glBindTexture(GL_TEXTURE_2D, textureObjectIds[0])
 
             val bitmap =
                 drawableToBitmap(ContextCompat.getDrawable(context, resourceId)!!)
                     ?: throw RuntimeException("Bitmap is null")
-            MyLogger.logIt("Bitmap is not null")
+            OpenGLLogger.logIt("Bitmap is not null")
 
-            MyLogger.logIt("Adding texture filtering")
+            OpenGLLogger.logIt("Adding texture filtering")
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-            MyLogger.logIt("Adding Bitmap to openGL")
+            OpenGLLogger.logIt("Adding Bitmap to openGL")
             GLUtils.texImage2D(GL_TEXTURE_2D, 0, bitmap, 0)
             bitmap.recycle()
-           /* MyLogger.logIt("Generating mipmap")
-            glGenerateMipmap(GL_TEXTURE_2D)*/
-          /*  MyLogger.logIt("Unbinding texture")
-            glBindTexture(GL_TEXTURE_2D, 0)*/
+            /* MyLogger.logIt("Generating mipmap")
+             glGenerateMipmap(GL_TEXTURE_2D)*/
+            /*  MyLogger.logIt("Unbinding texture")
+              glBindTexture(GL_TEXTURE_2D, 0)*/
             return textureObjectIds[0]
 
-        }
-
-        fun loadBitmap(context: Context, @DrawableRes resourceId: Int): Bitmap? {
-            val options = BitmapFactory.Options()
-            options.inScaled = false
-            val bitmap = BitmapFactory.decodeResource(context.resources, resourceId, options)
-            if (bitmap == null) {
-                MyLogger.logIt("Bitmap creation Failed")
-            } else {
-                MyLogger.logIt("Bitmap created")
-            }
-            return bitmap
         }
 
         fun drawableToBitmap(drawable: Drawable): Bitmap? {
@@ -215,8 +199,8 @@ class ELUtils {
             val index = glGetAttribLocation(programId, attribute)
             if (index > -1) {
                 callback(index)
-            }else{
-                MyLogger.logIt("Attribute not found => $attribute")
+            } else {
+                OpenGLLogger.logIt("Attribute not found => $attribute")
             }
         }
     }

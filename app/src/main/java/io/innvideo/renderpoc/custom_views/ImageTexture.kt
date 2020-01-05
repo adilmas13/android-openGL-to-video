@@ -2,7 +2,7 @@ package io.innvideo.renderpoc.custom_views
 
 import android.content.Context
 import android.graphics.Bitmap
-import io.innvideo.renderpoc.new_models.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
 
 
 class ImageTexture(

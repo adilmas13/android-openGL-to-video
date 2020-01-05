@@ -20,19 +20,19 @@ open class ShaderProgram(
     protected var program = 0
 
     init {
-        val vertexShader = ELUtils.createVertexShader(
+        val vertexShader = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 vertexShaderResourceId
             )
         )
-        val fragmentShader = ELUtils.createFragmentShader(
+        val fragmentShader = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 fragmentShaderResourceId
             )
         )
-        program = ELUtils.createProgram(
+        program = OpenGLUtils.createProgram(
             vertexShader,
             fragmentShader
         )

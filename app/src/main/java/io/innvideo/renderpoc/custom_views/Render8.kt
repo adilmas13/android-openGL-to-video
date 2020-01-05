@@ -4,7 +4,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.OpenGLUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -71,9 +71,9 @@ class Render8(val context: Context) : GLSurfaceView.Renderer {
         }
 
     override fun onDrawFrame(gl: GL10) {
-        ELUtils.validateProgram(programId)
+        OpenGLUtils.validateProgram(programId)
         // Add program to OpenGL ES environment
-        ELUtils.useProgram(programId)
+        OpenGLUtils.useProgram(programId)
 
         GLES20.glEnableVertexAttribArray(0)
 
@@ -105,13 +105,13 @@ class Render8(val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
-        vertexShaderId = ELUtils.createVertexShader(
+        vertexShaderId = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_vertex_shader
             )
         )
-        fragmentShaderId = ELUtils.createFragmentShader(
+        fragmentShaderId = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_fragment_shader
@@ -119,12 +119,12 @@ class Render8(val context: Context) : GLSurfaceView.Renderer {
         )
 
         // create empty OpenGL ES Program
-        programId = ELUtils.createProgram(vertexShaderId, fragmentShaderId)
+        programId = OpenGLUtils.createProgram(vertexShaderId, fragmentShaderId)
 
         if (programId > 0) {
             // delete the shaders since link is formed
-            ELUtils.deleteShader(vertexShaderId)
-            ELUtils.deleteShader(fragmentShaderId)
+            OpenGLUtils.deleteShader(vertexShaderId)
+            OpenGLUtils.deleteShader(fragmentShaderId)
         }
     }
 

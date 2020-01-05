@@ -3,7 +3,7 @@ package io.innvideo.renderpoc.gles
 import android.content.Context
 import io.innvideo.renderpoc.custom_views.ImageTexture
 import io.innvideo.renderpoc.custom_views.TextTexture
-import io.innvideo.renderpoc.new_models.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
 import io.innvideo.renderpoc.poc.OpenGLCore
 
 class EditorRenderer(

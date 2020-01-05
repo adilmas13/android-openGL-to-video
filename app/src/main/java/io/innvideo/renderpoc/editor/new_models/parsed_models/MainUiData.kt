@@ -1,13 +1,13 @@
-package io.innvideo.renderpoc.new_models.parsed_models
+package io.innvideo.renderpoc.editor.new_models.parsed_models
 
 import android.graphics.Bitmap
 import android.graphics.Typeface
-import io.innvideo.renderpoc.new_models.response_models.PositionResponseModel
+import io.innvideo.renderpoc.editor.new_models.response_models.PositionResponseModel
 
 class MainUiData {
-    var dimension = "1:1"
-    var audioData = AudioData()
-    var layers = mutableListOf<LayerData>()
+    var dimension = "1:1" // default 1:1
+    var audioData = AudioData() // the audio track
+    var layers = mutableListOf<LayerData>() // all the layers
 }
 
 class AudioData {

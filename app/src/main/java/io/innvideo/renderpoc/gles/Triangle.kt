@@ -3,7 +3,7 @@ package io.innvideo.renderpoc.gles
 import android.content.Context
 import android.opengl.GLES20
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.OpenGLUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -29,13 +29,13 @@ class Triangle(val context: Context) {
 
     init {
 
-        val vertexShader: Int = ELUtils.createVertexShader(
+        val vertexShader: Int = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.simple_vertex_shader
             )
         )
-        val fragmentShader: Int = ELUtils.createFragmentShader(
+        val fragmentShader: Int = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.simple_fragment_shader
@@ -43,7 +43,7 @@ class Triangle(val context: Context) {
         )
 
         // create empty OpenGL ES Program
-        mProgram = ELUtils.createProgram(vertexShader, fragmentShader)
+        mProgram = OpenGLUtils.createProgram(vertexShader, fragmentShader)
     }
 
 
@@ -66,9 +66,9 @@ class Triangle(val context: Context) {
         }
 
     fun draw() {
-        ELUtils.validateProgram(mProgram)
+        OpenGLUtils.validateProgram(mProgram)
         // Add program to OpenGL ES environment
-        ELUtils.useProgram(mProgram)
+        OpenGLUtils.useProgram(mProgram)
 
         // get handle to vertex shader's vPosition member
         positionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition").also {

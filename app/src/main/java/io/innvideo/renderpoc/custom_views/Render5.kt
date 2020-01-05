@@ -8,7 +8,7 @@ import android.opengl.GLES20.glClearColor
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.data.Image
-import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.OpenGLUtils
 import io.innvideo.renderpoc.gles.utils.TextureShaderProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -47,7 +47,7 @@ class Render5(val context: Context) : GLSurfaceView.Renderer {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         image = Image()
         textureProgram = TextureShaderProgram(context)
-        texture = ELUtils.createTexture(context, R.drawable.wall)
+        texture = OpenGLUtils.createTexture(context, R.drawable.wall)
     }
 
 

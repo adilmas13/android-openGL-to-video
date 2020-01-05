@@ -30,7 +30,7 @@ class GLSLTextReader {
             } catch (nfe: Resources.NotFoundException) {
                 throw RuntimeException("Resource not found: $resourceId", nfe)
             }
-            MyLogger.logIt("SHADER LOADED FROM RAW \n $body")
+            OpenGLLogger.logIt("SHADER LOADED FROM RAW \n $body")
             return body.toString()
         }
     }

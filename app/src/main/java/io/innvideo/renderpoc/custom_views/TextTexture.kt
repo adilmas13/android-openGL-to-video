@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import io.innvideo.renderpoc.new_models.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
 
 
 class TextTexture(

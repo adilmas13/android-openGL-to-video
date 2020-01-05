@@ -4,7 +4,7 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.OpenGLUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -152,14 +152,14 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
         }
 
     override fun onDrawFrame(gl: GL10) {
-        ELUtils.validateProgram(programId)
+        OpenGLUtils.validateProgram(programId)
 
         // Add program to OpenGL ES environment
-        ELUtils.useProgram(programId)
+        OpenGLUtils.useProgram(programId)
 
 
-        textureId = ELUtils.createTexture(context, R.drawable.wall)
-        ELUtils.getAttributeIndex(programId, "position") { index ->
+        textureId = OpenGLUtils.createTexture(context, R.drawable.wall)
+        OpenGLUtils.getAttributeIndex(programId, "position") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -170,7 +170,7 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
                 vertexBuffer
             )
         }
-        ELUtils.getAttributeIndex(programId, "texCoord") { index ->
+        OpenGLUtils.getAttributeIndex(programId, "texCoord") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -181,7 +181,7 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
                 textureBuffer
             )
         }
-        ELUtils.getAttributeIndex(programId, "inputColor") { index ->
+        OpenGLUtils.getAttributeIndex(programId, "inputColor") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -194,15 +194,15 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
         }
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, vertexCount)
-        ELUtils.deleteProgram(programId)
+        OpenGLUtils.deleteProgram(programId)
 
 
-        ELUtils.validateProgram(programId2)
+        OpenGLUtils.validateProgram(programId2)
 
         // Add program to OpenGL ES environment
-        ELUtils.useProgram(programId2)
-        textureId2 = ELUtils.createTexture(context, R.mipmap.ic_launcher)
-        ELUtils.getAttributeIndex(programId2, "position") { index ->
+        OpenGLUtils.useProgram(programId2)
+        textureId2 = OpenGLUtils.createTexture(context, R.mipmap.ic_launcher)
+        OpenGLUtils.getAttributeIndex(programId2, "position") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -213,7 +213,7 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
                 vertex2Buffer
             )
         }
-        ELUtils.getAttributeIndex(programId2, "texCoord") { index ->
+        OpenGLUtils.getAttributeIndex(programId2, "texCoord") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -224,7 +224,7 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
                 textureBuffer2
             )
         }
-        ELUtils.getAttributeIndex(programId2, "inputColor") { index ->
+        OpenGLUtils.getAttributeIndex(programId2, "inputColor") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -261,26 +261,26 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
-        vertexShaderId = ELUtils.createVertexShader(
+        vertexShaderId = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_texture_vertex_shader
             )
         )
-        fragmentShaderId = ELUtils.createFragmentShader(
+        fragmentShaderId = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_texture_fragment_shader
             )
         )
 
-        vertexShaderId2 = ELUtils.createVertexShader(
+        vertexShaderId2 = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_texture_vertex_shader
             )
         )
-        fragmentShaderId2 = ELUtils.createFragmentShader(
+        fragmentShaderId2 = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_texture_fragment_shader
@@ -288,8 +288,8 @@ class Render9(val context: Context) : GLSurfaceView.Renderer {
         )
 
         // create empty OpenGL ES Program
-        programId = ELUtils.createProgram(vertexShaderId, fragmentShaderId)
-        programId2 = ELUtils.createProgram(vertexShaderId2, fragmentShaderId2)
+        programId = OpenGLUtils.createProgram(vertexShaderId, fragmentShaderId)
+        programId2 = OpenGLUtils.createProgram(vertexShaderId2, fragmentShaderId2)
 
         if (programId > 0) {
 

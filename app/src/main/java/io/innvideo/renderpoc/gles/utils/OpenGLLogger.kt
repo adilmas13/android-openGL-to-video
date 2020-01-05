@@ -3,7 +3,7 @@ package io.innvideo.renderpoc.gles.utils
 import android.annotation.SuppressLint
 import android.util.Log
 
-class MyLogger {
+class OpenGLLogger {
 
     companion object {
         private const val LOG_TAG = "LOG_IT"

@@ -5,9 +5,9 @@ import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.utils.ELUtils
+import io.innvideo.renderpoc.gles.utils.OpenGLUtils
 import io.innvideo.renderpoc.gles.utils.GLSLTextReader
-import io.innvideo.renderpoc.gles.utils.MyLogger
+import io.innvideo.renderpoc.gles.utils.OpenGLLogger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig
@@ -92,11 +92,11 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
 
 
-        ELUtils.validateProgram(programId)
+        OpenGLUtils.validateProgram(programId)
         // Add program to OpenGL ES environment
-        ELUtils.useProgram(programId)
+        OpenGLUtils.useProgram(programId)
 
-        ELUtils.getAttributeIndex(programId, "position") { index ->
+        OpenGLUtils.getAttributeIndex(programId, "position") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -107,7 +107,7 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
                 vertexBuffer
             )
         }
-        ELUtils.getAttributeIndex(programId, "inputColor") { index ->
+        OpenGLUtils.getAttributeIndex(programId, "inputColor") { index ->
             GLES20.glEnableVertexAttribArray(index)
             GLES20.glVertexAttribPointer(
                 index,
@@ -147,7 +147,7 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        MyLogger.logIt("onSurfaceChanged => width $width = height $height")
+        OpenGLLogger.logIt("onSurfaceChanged => width $width = height $height")
         GLES20.glViewport(0, 0, width, height)
 
         val ratio: Float = width.toFloat() / height.toFloat()
@@ -159,13 +159,13 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         GLES20.glClearColor(1.0f, 0f, 0f, 1f)
-        vertexShaderId = ELUtils.createVertexShader(
+        vertexShaderId = OpenGLUtils.createVertexShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_vertex_shader
             )
         )
-        fragmentShaderId = ELUtils.createFragmentShader(
+        fragmentShaderId = OpenGLUtils.createFragmentShader(
             GLSLTextReader.readGlslFromRawRes(
                 context,
                 R.raw.sample_fragment_shader
@@ -173,12 +173,12 @@ class Render7(val context: Context) : GLSurfaceView.Renderer {
         )
 
         // create empty OpenGL ES Program
-        programId = ELUtils.createProgram(vertexShaderId, fragmentShaderId)
+        programId = OpenGLUtils.createProgram(vertexShaderId, fragmentShaderId)
 
         if (programId > 0) {
             // delete the shaders since link is formed
-            ELUtils.deleteShader(vertexShaderId)
-            ELUtils.deleteShader(fragmentShaderId)
+            OpenGLUtils.deleteShader(vertexShaderId)
+            OpenGLUtils.deleteShader(fragmentShaderId)
         }
     }
 

@@ -1,19 +1,9 @@
 package io.innvideo.renderpoc.custom_views
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
-import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.gles.Triangle
-import io.innvideo.renderpoc.gles.utils.ELUtils
-import io.innvideo.renderpoc.gles.utils.GLSLTextReader
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

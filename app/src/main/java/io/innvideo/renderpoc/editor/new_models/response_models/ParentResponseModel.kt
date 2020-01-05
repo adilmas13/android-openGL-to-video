@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.new_models.response_models
+package io.innvideo.renderpoc.editor.new_models.response_models
 
 import com.google.gson.annotations.SerializedName
 
