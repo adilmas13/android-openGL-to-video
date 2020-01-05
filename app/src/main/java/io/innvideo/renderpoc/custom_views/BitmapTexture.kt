@@ -84,8 +84,8 @@ class BitmapTexture(
             //绑定纹理
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureId)
             //环绕（超出纹理坐标范围）  （s==x t==y GL_REPEAT 重复）
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT)
-            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
             //过滤（纹理像素映射到坐标点）  （缩小、放大：GL_LINEAR线性）
             GLES20.glTexParameteri(
                 GLES20.GL_TEXTURE_2D,

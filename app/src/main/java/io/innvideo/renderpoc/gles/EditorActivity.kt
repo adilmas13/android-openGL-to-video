@@ -24,14 +24,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@Suppress("IMPLICIT_CAST_TO_ANY")
+
 class EditorActivity : AppCompatActivity() {
 
     private lateinit var uiData: MainUiData
 
+    private var touchListener = View.OnTouchListener { v, event ->
+        // Convert touch coordinates into normalized device
+        // coordinates, keeping in mind that Android's Y
+        // coordinates are inverted.
+        val normalizedX = event.x / v.width.toFloat() * 2 - 1
+        val normalizedY = -(event.y / v.height.toFloat() * 2 - 1)
+
+        true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
+        canvas.setOnTouchListener(touchListener)
         canvas.onSurfaceTextureAvailable { _, _, _ -> start() }
     }
 
