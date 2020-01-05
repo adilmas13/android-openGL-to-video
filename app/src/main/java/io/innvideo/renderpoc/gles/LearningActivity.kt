@@ -5,10 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import io.innvideo.renderpoc.custom_views.MyGLSurface
 import io.innvideo.renderpoc.custom_views.Render6
-import io.innvideo.renderpoc.custom_views.Render7
-import io.innvideo.renderpoc.custom_views.Render8
-import io.innvideo.renderpoc.custom_views.Render9
-import kotlinx.android.synthetic.main.activity_surface.view.*
 
 
 class LearningActivity : AppCompatActivity() {

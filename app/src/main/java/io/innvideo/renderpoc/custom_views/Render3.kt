@@ -18,7 +18,7 @@ class Render3(val context: Context) : GLSurfaceView.Renderer {
 
 
     override fun onDrawFrame(gl: GL10) {
-        GLES20.glClearColor(1.0f, 0.0f,0.0f, 1.0f)
+        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 // Create an empty, mutable bitmap
         // Create an empty, mutable bitmap
@@ -47,7 +47,7 @@ class Render3(val context: Context) : GLSurfaceView.Renderer {
 // draw the text centered
         // draw the text centered
         canvas.drawText("Hello World", 16f, 112f, textPaint)
-val textures = IntArray(1)
+        val textures = IntArray(1)
 //Generate one texture pointer...
         //Generate one texture pointer...
         gl.glGenTextures(1, textures, 0)

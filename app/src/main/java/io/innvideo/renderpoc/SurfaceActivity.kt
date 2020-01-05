@@ -197,7 +197,8 @@ class SurfaceActivity : AppCompatActivity(), TextureView.SurfaceTextureListener 
         }
         return isEndOfStream
     }
-val muxerBufferInfo = MediaCodec.BufferInfo()
+
+    val muxerBufferInfo = MediaCodec.BufferInfo()
     private fun encodeHere(
         decoder: MediaCodec,
         encoder: MediaCodec,
@@ -221,8 +222,9 @@ val muxerBufferInfo = MediaCodec.BufferInfo()
             val buff = encoderInputBuffer[index]
             muxerBufferInfo.size = buff.capacity()
             muxerBufferInfo.offset = 0
-       //     muxerBufferInfo.presentationTimeUs = info.presentationTimeUs
-            muxerBufferInfo.flags = if (isEndOfStream.not()) MediaCodec.BUFFER_FLAG_KEY_FRAME else MediaCodec.BUFFER_FLAG_END_OF_STREAM
+            //     muxerBufferInfo.presentationTimeUs = info.presentationTimeUs
+            muxerBufferInfo.flags =
+                if (isEndOfStream.not()) MediaCodec.BUFFER_FLAG_KEY_FRAME else MediaCodec.BUFFER_FLAG_END_OF_STREAM
             /* buff.clear()
              buff.put(bufferByte)
              encoder.queueInputBuffer(index, 0, buff.limit(), info.presentationTimeUs, 0)*/

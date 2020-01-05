@@ -77,13 +77,13 @@ class MyRenderer(val context: Context) : GLSurfaceView.Renderer {
         val bitmap =
             drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.shape_rounded)!!)
         if (bitmap != null) {
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
             // bind the texture and set parameters
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0])
 
-            GLES20.glEnable(GLES20.GL_BLEND);
+            GLES20.glEnable(GLES20.GL_BLEND)
 
-            GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+            GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA)
             //Create Nearest Filtered Texture
             GLES20.glTexParameteri(
                 GLES20.GL_TEXTURE_2D,

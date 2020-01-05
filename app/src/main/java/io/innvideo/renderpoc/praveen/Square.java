@@ -12,7 +12,7 @@ public class Square {
 
     private FloatBuffer mVertexBuffer;
 
-    private float vertices[] = {
+    private float[] vertices = {
             -1.0f, -1.0f, 0.0f,
             -1.0f, -1f, 0.0f,
             1.0f, -1.0f, 0.0f,
@@ -31,7 +31,7 @@ public class Square {
         gl.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
         gl.glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
         gl.glVertexPointer(3, GLES10.GL_FLAT, 0, mVertexBuffer);
-        gl.glDrawArrays(GLES10.GL_TRIANGLE_STRIP, 0, vertices.length/3);
+        gl.glDrawArrays(GLES10.GL_TRIANGLE_STRIP, 0, vertices.length / 3);
         gl.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
     }
 }

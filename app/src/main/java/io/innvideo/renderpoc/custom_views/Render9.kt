@@ -4,8 +4,8 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig

@@ -8,7 +8,8 @@ class Image {
 
     private val POSITION_COMPONENT_COUNT = 2
     private val TEXTURE_COORDINATES_COMPONENT_COUNT: Int = 2
-    private val STRIDE: Int = (POSITION_COMPONENT_COUNT + TEXTURE_COORDINATES_COMPONENT_COUNT) * 4 // FLOAT BYTE COUNT
+    private val STRIDE: Int =
+        (POSITION_COMPONENT_COUNT + TEXTURE_COORDINATES_COMPONENT_COUNT) * 4 // FLOAT BYTE COUNT
     private val VERTEX_DATA = floatArrayOf(
         // Triangle Fan
         // Order of coordinates:

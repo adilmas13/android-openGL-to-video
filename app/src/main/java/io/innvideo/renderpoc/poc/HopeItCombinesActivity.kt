@@ -80,9 +80,12 @@ class HopeItCombinesActivity : AppCompatActivity(), RenderListener {
             retriever.setDataSource(INPUT_FILE)
             val duration =
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toInt()
-            retriever.getFramesAtIndex(0,10)
+            retriever.getFramesAtIndex(0, 10)
             for (i in 0 until 30) {
-                val bitmap = retriever.getFrameAtTime((i * 10000).toLong(), MediaMetadataRetriever.OPTION_CLOSEST)
+                val bitmap = retriever.getFrameAtTime(
+                    (i * 10000).toLong(),
+                    MediaMetadataRetriever.OPTION_CLOSEST
+                )
                 withContext(Dispatchers.Main) {
                     ivPreview.setImageBitmap(bitmap)
                 }

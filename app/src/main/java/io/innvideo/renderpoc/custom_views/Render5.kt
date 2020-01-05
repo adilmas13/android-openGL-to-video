@@ -7,8 +7,8 @@ import android.opengl.GLES20.glClear
 import android.opengl.GLES20.glClearColor
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.gles.data.Image
 import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
+import io.innvideo.renderpoc.gles.data.Image
 import io.innvideo.renderpoc.gles.utils.TextureShaderProgram
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

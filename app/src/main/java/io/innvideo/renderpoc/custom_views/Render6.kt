@@ -24,8 +24,8 @@ class Render6(val context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig?) {
         //  glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-      /*  bitmapTexture = BitmapTexture(context, ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.wall)!!)!!);
-        bitmapTexture.onSurfaceCreated();*/
+        /*  bitmapTexture = BitmapTexture(context, ELUtils.drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.wall)!!)!!);
+          bitmapTexture.onSurfaceCreated();*/
     }
 
 }

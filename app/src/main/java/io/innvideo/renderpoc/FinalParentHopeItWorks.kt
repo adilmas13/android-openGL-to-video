@@ -16,7 +16,7 @@ import java.nio.ShortBuffer
 class FinalParentHopeItWorks(
     private var context: Context,
     private var texture: SurfaceTexture,
-    private var surface:Surface,
+    private var surface: Surface,
     private var myWidth: Int,
     private var myHeight: Int
 ) : TextureSurfaceRenderer(surface, myWidth, myHeight), SurfaceTexture.OnFrameAvailableListener {
@@ -139,7 +139,7 @@ class FinalParentHopeItWorks(
     override fun deInitGLComponents() {
         GLES20.glDeleteTextures(1, textures, 0)
         GLES20.glDeleteProgram(shaderProgram)
-        if (texture is SurfaceTexture){
+        if (texture is SurfaceTexture) {
             texture.release()
             texture.setOnFrameAvailableListener(null)
         }

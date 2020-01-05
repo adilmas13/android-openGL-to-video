@@ -28,10 +28,14 @@ class FramesExtractorActivity : AppCompatActivity() {
         try {
             val frames = metaMetaDataRetriever.getFramesAtIndex(0, 200)
             rvTimeline.apply {
-                layoutManager = LinearLayoutManager(this@FramesExtractorActivity, LinearLayoutManager.HORIZONTAL, false)
+                layoutManager = LinearLayoutManager(
+                    this@FramesExtractorActivity,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+                )
                 adapter = TimelineAdapter(frames)
             }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             toastIt("Something went wrong")
         }
         metaMetaDataRetriever.release()

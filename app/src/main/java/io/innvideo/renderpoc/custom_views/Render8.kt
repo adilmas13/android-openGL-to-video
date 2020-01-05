@@ -4,8 +4,8 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLUtils
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.ShortBuffer
@@ -29,10 +29,10 @@ class Render8(val context: Context) : GLSurfaceView.Renderer {
 
         private var vertices = floatArrayOf(
             // x,y,z
-            -0.5f,  0.5f,   0.0f,      // top left
-            -0.5f,  -0.5f,  0.0f,      // bottom left
-            0.5f,   -0.5f,  0.0f,      // bottom right
-            0.5f,   0.5f,   0.0f       // top right
+            -0.5f, 0.5f, 0.0f,      // top left
+            -0.5f, -0.5f, 0.0f,      // bottom left
+            0.5f, -0.5f, 0.0f,      // bottom right
+            0.5f, 0.5f, 0.0f       // top right
         )
 
         private val drawOrder = shortArrayOf(0, 1, 2, 0, 2, 3) // order to draw vertices
@@ -87,7 +87,7 @@ class Render8(val context: Context) : GLSurfaceView.Renderer {
             vertexBuffer
         )
         // Draw the triangle
-       // GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
+        // GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, vertexCount)
 
         GLES20.glDrawElements(
             GLES20.GL_TRIANGLES,

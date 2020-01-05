@@ -12,7 +12,8 @@ class TimelineAdapter(val list: List<Bitmap>) :
     RecyclerView.Adapter<TimelineAdapter.TimelineViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimelineViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.adapter_timeline, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.adapter_timeline, parent, false)
         return TimelineViewHolder(view)
     }
 

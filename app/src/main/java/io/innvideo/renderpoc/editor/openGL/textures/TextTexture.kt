@@ -33,10 +33,10 @@ class TextTexture(
         val realTextWidth = textPaint.measureText(textData.text)
         val bitmapWidth = (realTextWidth + 2f).toInt()
         val bitmapHeight = fontSize + 30
-        textBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+        textBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888)
         textBitmap.eraseColor(Color.argb(0, 255, 255, 255))
         val bitmapCanvas = Canvas(textBitmap)
-        bitmapCanvas.drawText(textData.text, 1f, 1.0f + fontSize * 0.75f, textPaint);
+        bitmapCanvas.drawText(textData.text, 1f, 1.0f + fontSize * 0.75f, textPaint)
         /*  val canvas = Canvas(bitmap)
 
           val textPaint = TextPaint()

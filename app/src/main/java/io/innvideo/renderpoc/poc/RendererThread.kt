@@ -50,7 +50,8 @@ class RendererThread(
 
     private fun List<Layer>.hasBackground() = this.indexOfFirst { it is Layer.Background } > -1
 
-    private fun List<Layer>.getBackgroundLayer() = this.first { it is Layer.Background } as Layer.Background
+    private fun List<Layer>.getBackgroundLayer() =
+        this.first { it is Layer.Background } as Layer.Background
 
     private fun setPosition(x: Int, y: Int, width: Int, height: Int) {
         GLES20.glScissor(x, y, width, height)
