@@ -28,6 +28,8 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var uiData: MainUiData
 
+    private lateinit var renderer: EditorRenderer
+
     private var touchListener = View.OnTouchListener { v, event ->
         // Convert touch coordinates into normalized device
         // coordinates, keeping in mind that Android's Y
@@ -71,7 +73,7 @@ class EditorActivity : AppCompatActivity() {
     private fun setParsedDataOnUi() {
         canvasParent.getWidthAndHeightAfterRender { width, height ->
             setCanvasDimension(width, height)
-            getAllBitmaps { setLayersOnScreen() }
+            getAllBitmaps { startScreenRenderer() }
         }
     }
 
@@ -91,18 +93,12 @@ class EditorActivity : AppCompatActivity() {
         }
     }
 
-    private fun setLayersOnScreen() {
-        val renderer = EditorRenderer(
+    private fun startScreenRenderer() {
+        renderer = EditorRenderer(
             context = this,
-            surfaceTexture = canvas.surfaceTexture,
-            layers = uiData.layers,
-            completionListener = ::onRenderCompleted
-        )
+            surfaceTexture = canvas.surfaceTexture
+        ) { renderer.addLayers(uiData.layers) }
         renderer.start()
-    }
-
-    private fun onRenderCompleted() {
-
     }
 
     private fun setCanvasDimension(width: Int, height: Int) {
@@ -113,4 +109,8 @@ class EditorActivity : AppCompatActivity() {
         canvas.layoutParams = params
     }
 
+    override fun onDestroy() {
+        renderer.release()
+        super.onDestroy()
+    }
 }

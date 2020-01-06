@@ -2,7 +2,9 @@ package io.innvideo.renderpoc.editor.new_models.parsed_models
 
 import android.graphics.Bitmap
 import android.graphics.Typeface
+import android.os.Parcelable
 import io.innvideo.renderpoc.editor.new_models.response_models.PositionResponseModel
+import kotlinx.android.parcel.Parcelize
 
 class MainUiData {
     var dimension = "1:1" // default 1:1
@@ -14,9 +16,13 @@ class AudioData {
     var url = ""
 }
 
-sealed class LayerData {
-    class Image(val image: String, var bitmap: Bitmap? = null) : LayerData()
-    class Text(val text: String) : LayerData() {
+sealed class LayerData : Parcelable {
+
+    @Parcelize
+    data class Image(val image: String, var bitmap: Bitmap? = null) : LayerData(), Parcelable
+
+    @Parcelize
+    data class Text(val text: String) : LayerData(), Parcelable {
         var fontFamily: Typeface? = null
     }
 
