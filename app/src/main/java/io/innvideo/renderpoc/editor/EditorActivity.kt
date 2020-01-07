@@ -14,6 +14,7 @@ import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
 import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseModel
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
+import io.innvideo.renderpoc.editor.video_renderer.VideoRenderer
 import io.innvideo.renderpoc.utils.getWidthAndHeightAfterRender
 import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
 import io.innvideo.renderpoc.utils.toastIt
@@ -45,6 +46,16 @@ class EditorActivity : AppCompatActivity() {
         setContentView(R.layout.activity_editor)
         canvas.setOnTouchListener(touchListener)
         canvas.onSurfaceTextureAvailable { _, _, _ -> start() }
+        btnExport.setOnClickListener {
+            val thread = Thread(Runnable {
+                VideoRenderer(this, uiData)
+                    .withAudio()
+                    .onCompleted { runOnUiThread { toastIt("Video Rendered") } }
+                    .onError { runOnUiThread { toastIt("Failed to create video") } }
+                    .render()
+            })
+            thread.start()
+        }
     }
 
     private fun start() {
