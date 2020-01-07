@@ -12,7 +12,6 @@ import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
 import io.innvideo.renderpoc.editor.new_models.response_models.BlockResponseModel
 import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseModel
 
-@Suppress("IMPLICIT_CAST_TO_ANY")
 class EditorDataParser(private val context: Context, private val data: ParentResponseModel) {
 
     private var uiData = MainUiData()

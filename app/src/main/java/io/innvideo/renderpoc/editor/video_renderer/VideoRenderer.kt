@@ -163,8 +163,8 @@ class VideoRenderer(
         }
 
         val muxer = MediaMuxer(getOutputFilePath(), MUXER_OUTPUT_FORMAT)
-        var videoTrackIndex = muxer.addTrack(videoFormat)
-        var audioTrackIndex = muxer.addTrack(newAudioFormat)
+        var videoTrackIndex = -1 // muxer.addTrack(videoFormat)
+        var audioTrackIndex = -1 //muxer.addTrack(newAudioFormat)
 
         val inputSurface = videoEncoder.createInputSurface()
         val thread = VideoRendererContainer(context, uiData, inputSurface) {
@@ -178,7 +178,7 @@ class VideoRenderer(
         audioDecoder.start()
         audioEncoder.start()
         videoEncoder.start()
-        muxer.start()
+
         thread.start()
         var allInputExtracted = false
         var allInputDecoded = false
@@ -188,35 +188,9 @@ class VideoRenderer(
         var counter = 0
         var videoEncodingEOS = false
         var muxerStarted = false
-        while (allOutputEncoded.not() && videoEncodingEOS.not()) {
+        var muxerCounter = 0
+        while (allOutputEncoded.not()) {
 
-            while (videoEncodingEOS.not()) {
-                val index = videoEncoder.dequeueOutputBuffer(videoBufferInfo, 0)
-                if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    // videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
-                    if (muxerStarted.not()) {
-                        muxerStarted = true
-                        // muxer.start()
-                    }
-                } else if (index >= 0) {
-
-                    val byteBuffer = videoEncoder.getOutputBuffer(index)
-                    if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                        // The codec config data was pulled out and fed to the muxer when we got
-                        // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
-                        videoBufferInfo.size = 0
-                    }
-                    byteBuffer?.position(videoBufferInfo.offset)
-                    byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
-                    muxer.writeSampleData(videoTrackIndex, byteBuffer!!, videoBufferInfo)
-                    videoEncoder.releaseOutputBuffer(index, false)
-                    if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                        videoEncodingEOS = true
-                    }
-                } else {
-                    EglUtil.logIt("NOTHING => $index")
-                }
-            } // while loop for video
 
             // Feed input to audioDecoder
             if (!allInputExtracted) {
@@ -245,7 +219,32 @@ class VideoRenderer(
             var encoderOutputAvailable = true
             var decoderOutputAvailable = !allInputDecoded
 
-            while (encoderOutputAvailable || decoderOutputAvailable) {
+            while (encoderOutputAvailable || decoderOutputAvailable || videoEncodingEOS.not()) {
+
+                val index = videoEncoder.dequeueOutputBuffer(videoBufferInfo, 0)
+                if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
+                    if (++muxerCounter == 2) {
+                        muxer.start()
+                    }
+                } else if (index >= 0) {
+
+                    val byteBuffer = videoEncoder.getOutputBuffer(index)
+                    if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+                        // The codec config data was pulled out and fed to the muxer when we got
+                        // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
+                        videoBufferInfo.size = 0
+                    }
+                    byteBuffer?.position(videoBufferInfo.offset)
+                    byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
+                    muxer.writeSampleData(videoTrackIndex, byteBuffer!!, videoBufferInfo)
+                    videoEncoder.releaseOutputBuffer(index, false)
+                    if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        videoEncodingEOS = true
+                    }
+                } else {
+                    EglUtil.logIt("NOTHING => $index")
+                }
 
                 // Drain audioEncoder & mux first
                 val outBufferId = audioEncoder.dequeueOutputBuffer(audioBufferInfo, timeoutUs)
@@ -265,10 +264,9 @@ class VideoRenderer(
                 } else if (outBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     encoderOutputAvailable = false
                 } else if (outBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    // audioTrackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
-                    if (muxerStarted.not()) {
-                        muxerStarted = true
-                        //   muxer.start()
+                    audioTrackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
+                    if (++muxerCounter == 2) {
+                           muxer.start()
                     }
                 }
 
