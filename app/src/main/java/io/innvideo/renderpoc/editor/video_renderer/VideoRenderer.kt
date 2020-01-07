@@ -97,7 +97,7 @@ class VideoRenderer(
     ).apply {
         setInteger(KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
         setInteger(KEY_BIT_RATE, inputAudioFormat.getInteger(KEY_BIT_RATE))
-        setInteger(KEY_MAX_INPUT_SIZE,1048576 /*inputAudioFormat.getInteger(KEY_MAX_INPUT_SIZE)*/)
+        setInteger(KEY_MAX_INPUT_SIZE, 1048576 /*inputAudioFormat.getInteger(KEY_MAX_INPUT_SIZE)*/)
     }
 
     fun render() {
@@ -164,8 +164,8 @@ class VideoRenderer(
         }
 
         val muxer = MediaMuxer(getOutputFilePath(), MUXER_OUTPUT_FORMAT)
-        var videoTrackIndex = -1 //mediaMuxer.addTrack(videoFormat)
-        var audioTrackIndex = -1 // muxer.addTrack(newAudioFormat)
+        var videoTrackIndex = muxer.addTrack(videoFormat)
+        var audioTrackIndex =  muxer.addTrack(newAudioFormat)
 
         val inputSurface = videoEncoder.createInputSurface()
         val thread = VideoRendererContainer(context, uiData, inputSurface) {
@@ -178,17 +178,46 @@ class VideoRenderer(
 
         audioDecoder.start()
         audioEncoder.start()
-//        videoEncoder.start()
-//        thread.start()
+        videoEncoder.start()
+        muxer.start()
+        thread.start()
         var allInputExtracted = false
         var allInputDecoded = false
         var allOutputEncoded = false
 
         val timeoutUs = 10000L
-        val bufferInfo = MediaCodec.BufferInfo()
-        var trackIndex = -1
-var counter = 0
-        while (!allOutputEncoded) {
+        var counter = 0
+        var videoEncodingEOS = false
+        var muxerStarted = false
+        while (allOutputEncoded.not() && videoEncodingEOS.not()) {
+
+            while (videoEncodingEOS.not()) {
+                val index = videoEncoder.dequeueOutputBuffer(videoBufferInfo, 0)
+                if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                   // videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
+                    if (muxerStarted.not()) {
+                        muxerStarted = true
+                       // muxer.start()
+                    }
+                } else if (index >= 0) {
+
+                    val byteBuffer = videoEncoder.getOutputBuffer(index)
+                    if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+                        // The codec config data was pulled out and fed to the muxer when we got
+                        // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
+                        videoBufferInfo.size = 0
+                    }
+                    byteBuffer?.position(videoBufferInfo.offset)
+                    byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
+                    muxer.writeSampleData(videoTrackIndex, byteBuffer!!, videoBufferInfo)
+                    videoEncoder.releaseOutputBuffer(index, false)
+                    if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                        videoEncodingEOS = true
+                    }
+                } else {
+                    EglUtil.logIt("NOTHING => $index")
+                }
+            } // while loop for video
 
             // Feed input to audioDecoder
             if (!allInputExtracted) {
@@ -197,7 +226,7 @@ var counter = 0
                     val buffer = audioDecoder.getInputBuffer(inBufferId)!!
                     val sampleSize = extractor.readSampleData(buffer, 0)
 
-                    if (sampleSize >= 0 && counter++ < 100) {
+                    if (sampleSize >= 0 && counter++ < 200) {
                         audioDecoder.queueInputBuffer(
                             inBufferId, 0, sampleSize,
                             extractor.sampleTime, extractor.sampleFlags
@@ -220,25 +249,28 @@ var counter = 0
             while (encoderOutputAvailable || decoderOutputAvailable) {
 
                 // Drain audioEncoder & mux first
-                val outBufferId = audioEncoder!!.dequeueOutputBuffer(bufferInfo, timeoutUs)
+                val outBufferId = audioEncoder!!.dequeueOutputBuffer(audioBufferInfo, timeoutUs)
                 if (outBufferId >= 0) {
 
                     val encodedBuffer = audioEncoder!!.getOutputBuffer(outBufferId)!!
 
-                    muxer!!.writeSampleData(trackIndex, encodedBuffer, bufferInfo)
+                    muxer!!.writeSampleData(audioTrackIndex, encodedBuffer, audioBufferInfo)
 
                     audioEncoder!!.releaseOutputBuffer(outBufferId, false)
 
                     // Are we finished here?
-                    if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    if ((audioBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                         allOutputEncoded = true
                         break
                     }
                 } else if (outBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     encoderOutputAvailable = false
                 } else if (outBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    trackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
-                    muxer!!.start()
+                   // audioTrackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
+                    if (muxerStarted.not()) {
+                        muxerStarted = true
+                     //   muxer.start()
+                    }
                 }
 
                 if (outBufferId != MediaCodec.INFO_TRY_AGAIN_LATER)
@@ -246,7 +278,7 @@ var counter = 0
 
                 // Get output from audioDecoder and feed it to audioEncoder
                 if (!allInputDecoded) {
-                    val outBufferId = audioDecoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
+                    val outBufferId = audioDecoder.dequeueOutputBuffer(audioBufferInfo, timeoutUs)
                     if (outBufferId >= 0) {
                         val outBuffer = audioDecoder.getOutputBuffer(outBufferId)
 
@@ -264,13 +296,17 @@ var counter = 0
 
                         // Feed audioEncoder
                         audioEncoder.queueInputBuffer(
-                            inBufferId, bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs,
-                            bufferInfo.flags)
+                            inBufferId,
+                            audioBufferInfo.offset,
+                            audioBufferInfo.size,
+                            audioBufferInfo.presentationTimeUs,
+                            audioBufferInfo.flags
+                        )
 
                         audioDecoder.releaseOutputBuffer(outBufferId, false)
 
                         // Did we get all output from audioDecoder?
-                        if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
+                        if ((audioBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
                             allInputDecoded = true
 
                     } else if (outBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -280,6 +316,7 @@ var counter = 0
             }
         }
 
+        var isError = false
         try {
             muxer.apply {
                 stop()
@@ -293,11 +330,19 @@ var counter = 0
                 stop()
                 release()
             }
+            videoEncoder.apply {
+                stop()
+                release()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            videoCreationError()
+            isError = true
         }
-        videoCreationCompleted()
+        if (isError) {
+            videoCreationError()
+        } else {
+            videoCreationCompleted()
+        }
     }
 
     private fun renderWithSupportedAudioFormat(
