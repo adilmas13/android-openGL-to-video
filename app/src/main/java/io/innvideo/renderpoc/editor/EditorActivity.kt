@@ -15,9 +15,6 @@ import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseMod
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
 import io.innvideo.renderpoc.editor.video_renderer.VideoRenderer
-import io.innvideo.renderpoc.utils.getWidthAndHeightAfterRender
-import io.innvideo.renderpoc.utils.onSurfaceTextureAvailable
-import io.innvideo.renderpoc.utils.toastIt
 import kotlinx.android.synthetic.main.activity_editor.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -23,8 +23,7 @@ import android.os.Environment
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.VideoRendererContainer
 import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
-import io.innvideo.renderpoc.poc.EglUtil
-import io.innvideo.renderpoc.poc.VideoUtils
+import io.innvideo.renderpoc.editor.openGL.utils.EglUtil
 import java.nio.ByteBuffer
 
 class VideoRenderer(
@@ -165,7 +164,7 @@ class VideoRenderer(
 
         val muxer = MediaMuxer(getOutputFilePath(), MUXER_OUTPUT_FORMAT)
         var videoTrackIndex = muxer.addTrack(videoFormat)
-        var audioTrackIndex =  muxer.addTrack(newAudioFormat)
+        var audioTrackIndex = muxer.addTrack(newAudioFormat)
 
         val inputSurface = videoEncoder.createInputSurface()
         val thread = VideoRendererContainer(context, uiData, inputSurface) {
@@ -194,10 +193,10 @@ class VideoRenderer(
             while (videoEncodingEOS.not()) {
                 val index = videoEncoder.dequeueOutputBuffer(videoBufferInfo, 0)
                 if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                   // videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
+                    // videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
                     if (muxerStarted.not()) {
                         muxerStarted = true
-                       // muxer.start()
+                        // muxer.start()
                     }
                 } else if (index >= 0) {
 
@@ -249,14 +248,14 @@ class VideoRenderer(
             while (encoderOutputAvailable || decoderOutputAvailable) {
 
                 // Drain audioEncoder & mux first
-                val outBufferId = audioEncoder!!.dequeueOutputBuffer(audioBufferInfo, timeoutUs)
+                val outBufferId = audioEncoder.dequeueOutputBuffer(audioBufferInfo, timeoutUs)
                 if (outBufferId >= 0) {
 
-                    val encodedBuffer = audioEncoder!!.getOutputBuffer(outBufferId)!!
+                    val encodedBuffer = audioEncoder.getOutputBuffer(outBufferId)!!
 
-                    muxer!!.writeSampleData(audioTrackIndex, encodedBuffer, audioBufferInfo)
+                    muxer.writeSampleData(audioTrackIndex, encodedBuffer, audioBufferInfo)
 
-                    audioEncoder!!.releaseOutputBuffer(outBufferId, false)
+                    audioEncoder.releaseOutputBuffer(outBufferId, false)
 
                     // Are we finished here?
                     if ((audioBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -266,10 +265,10 @@ class VideoRenderer(
                 } else if (outBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     encoderOutputAvailable = false
                 } else if (outBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                   // audioTrackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
+                    // audioTrackIndex = muxer!!.addTrack(audioEncoder!!.outputFormat)
                     if (muxerStarted.not()) {
                         muxerStarted = true
-                     //   muxer.start()
+                        //   muxer.start()
                     }
                 }
 

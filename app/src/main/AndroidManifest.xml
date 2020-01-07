@@ -21,17 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".gles.LearningActivity">
-
-        </activity>
-        <activity android:name=".poc.FramesExtractorActivity" />
-        <activity android:name=".poc.HopeItCombinesActivity"></activity>
-        <activity android:name=".praveen.PraveenActivity" />
-        <activity android:name=".TrialActivity" />
-        <activity android:name=".GLActivity" />
-        <activity android:name=".BasicActivity" />
-        <activity android:name=".SurfaceActivity" />
-        <activity android:name=".MainActivity" />
 
         <meta-data
             android:name="preloaded_fonts"
