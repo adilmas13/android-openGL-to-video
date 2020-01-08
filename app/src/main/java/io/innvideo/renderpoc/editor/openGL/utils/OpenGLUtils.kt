@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.opengl.EGL14
 import android.opengl.GLES20.GL_COMPILE_STATUS
 import android.opengl.GLES20.GL_FRAGMENT_SHADER
 import android.opengl.GLES20.GL_LINEAR
@@ -204,6 +205,17 @@ class OpenGLUtils {
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
             return bitmap
+        }
+
+        private fun checkEglError(msg: String) {
+            var error: Int
+            if (EGL14.eglGetError().also { error = it } != EGL14.EGL_SUCCESS) {
+                throw RuntimeException(
+                    "$msg: EGL error: 0x" + Integer.toHexString(
+                        error
+                    )
+                )
+            }
         }
 
         fun getAttributeIndex(programId: Int, attribute: String, callback: (Int) -> Unit) {

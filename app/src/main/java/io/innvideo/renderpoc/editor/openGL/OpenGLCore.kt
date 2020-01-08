@@ -2,7 +2,7 @@ package io.innvideo.renderpoc.editor.openGL
 
 import android.opengl.EGL14
 import android.opengl.GLUtils
-import io.innvideo.renderpoc.editor.openGL.utils.EglUtil
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLLogger
 import javax.microedition.khronos.egl.EGL10
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.egl.EGLContext
@@ -35,7 +35,7 @@ class OpenGLCore(private val surface: Any) {
             egl.eglCreateWindowSurface(eglDisplay, eglConfig, this.surface, null)
         // Step 2 : To activate drawing
         val activated = egl.eglMakeCurrent(eglDisplay, eglSurface, eglSurface, eglContext)
-        EglUtil.logIt("=== ACTIVE STATUE ===> ${activated}")
+        OpenGLLogger.logIt("=== ACTIVE STATUE ===> $activated")
     }
 
     /*
@@ -67,11 +67,11 @@ class OpenGLCore(private val surface: Any) {
             EGL10.EGL_NO_CONTEXT,
             contextAttributes
         )
-        EglUtil.logIt("=== Initialised ===")
+        OpenGLLogger.logIt("=== Initialised ===")
     }
 
     fun release() {
-        EglUtil.logIt("=== RELEASING ===>")
+        OpenGLLogger.logIt("=== RELEASING ===>")
         egl.eglMakeCurrent(
             eglDisplay,
             EGL10.EGL_NO_SURFACE,

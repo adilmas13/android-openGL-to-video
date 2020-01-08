@@ -31,7 +31,7 @@ class VideoRendererContainer(
         var counter = 0
         openGLCore.init()
         layers.addAll(uiData.layers)
-        while (counter++ < 5) {
+        while (counter++ < 15) {
             renderOnScreen()
             sleep(33)
         }
