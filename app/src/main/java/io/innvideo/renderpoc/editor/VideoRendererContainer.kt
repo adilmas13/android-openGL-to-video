@@ -28,18 +28,27 @@ class VideoRendererContainer(
     private val layers = mutableListOf<LayerData>()
 
     override fun run() {
-        var counter = 0
-        openGLCore.init()
-        layers.addAll(uiData.layers)
-        while (counter++ < 15) {
-            renderOnScreen()
-            sleep(33)
+        try {
+            var counter = 0
+            openGLCore.init()
+            layers.addAll(uiData.layers)
+            while (counter++ < 600) {
+                logIt("RENDERING AT => $counter")
+                // if (counter < 20) renderOnScreen()
+                sleep(33)
+            }
+            logIt("UI RENDERING COMPLETED => ")
+            onCompleted()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            logIt("THREAD EXCEPTION")
+        } finally {
+            logIt("FINAL BLOCK")
         }
-        onCompleted()
     }
 
     private fun renderOnScreen() {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
         glClear(GL_COLOR_BUFFER_BIT)
         layers.forEach { layer ->
             when (layer) {

@@ -8,6 +8,7 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.Coil
 import coil.api.load
 import com.google.gson.Gson
+import io.innvideo.renderpoc.BuildConfig
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
 import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
@@ -47,8 +48,9 @@ class EditorActivity : AppCompatActivity() {
             val thread = Thread(Runnable {
                 VideoRenderer(this, uiData)
                     .withAudio()
-                    .onCompleted { runOnUiThread { toastIt("Video Rendered") } }
-                    .onError { runOnUiThread { toastIt("Failed to create video") } }
+                    .onCompleted { toastIt("Video Rendered") }
+                    .onError { toastIt("Failed to create video") }
+                    .enableDebug(BuildConfig.DEBUG)
                     .render()
             })
             thread.start()
