@@ -34,7 +34,7 @@ class VideoRendererContainer(
             layers.addAll(uiData.layers)
             while (counter++ < 600) {
                 logIt("RENDERING AT => $counter")
-                // if (counter < 20) renderOnScreen()
+                if (counter < 20) renderOnScreen()
                 sleep(33)
             }
             logIt("UI RENDERING COMPLETED => ")
