@@ -1,5 +1,7 @@
 package io.innvideo.renderpoc.editor
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +31,8 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var renderer: EditorRenderer
 
+    private lateinit var sharableFilepath: String
+
     private var touchListener = View.OnTouchListener { v, event ->
         // Convert touch coordinates into normalized device
         // coordinates, keeping in mind that Android's Y
@@ -42,19 +46,36 @@ class EditorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
+        group.visibility = View.GONE
+        tvShare.setOnClickListener { shareVideo() }
         canvas.setOnTouchListener(touchListener)
         canvas.onSurfaceTextureAvailable { _, _, _ -> start() }
         btnExport.setOnClickListener {
+            group.visibility = View.VISIBLE
+            tvShare.visibility = View.GONE
             val thread = Thread(Runnable {
                 VideoRenderer(this, uiData)
                     .withAudio()
-                    .onCompleted { toastIt("Video Rendered") }
+                    .onCompleted {
+                        sharableFilepath = it
+                        group.visibility = View.GONE
+                        tvShare.visibility = View.VISIBLE
+                        toastIt("Video Rendered")
+                    }
                     .onError { toastIt("Failed to create video") }
                     .enableDebug(BuildConfig.DEBUG)
                     .render()
             })
             thread.start()
         }
+    }
+
+    private fun shareVideo() {
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        val screenshotUri: Uri = Uri.parse(sharableFilepath)
+        sharingIntent.type = "video/mp4"
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri)
+        startActivity(Intent.createChooser(sharingIntent, "Share using"))
     }
 
     private fun start() {

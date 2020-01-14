@@ -33,8 +33,9 @@ class VideoRenderer(
 ) {
     private var audioExist = false
     private var isDebugEnabled = false
-    private var completedCallback: (() -> Unit)? = null
+    private var completedCallback: ((filePath: String) -> Unit)? = null
     private var errorCallback: (() -> Unit)? = null
+    private lateinit var generateFilePath: String
 
     companion object {
         private const val LOG_TAG = "LOG_VIDEO"
@@ -62,7 +63,7 @@ class VideoRenderer(
         return this
     }
 
-    fun onCompleted(callback: () -> Unit): VideoRenderer {
+    fun onCompleted(callback: (String) -> Unit): VideoRenderer {
         this.completedCallback = callback
         return this
     }
@@ -349,8 +350,6 @@ class VideoRenderer(
                     }
                 }// end of while hasAudioToEncode
                 /** video encoder + audio encoder ***/
-//            val videoEncoderBufferId = videoEncoder.dequeueOutputBuffer(videoBufferInfo, TIME_OUT)
-
 
             } // while isCompleted loop
 
@@ -514,7 +513,7 @@ class VideoRenderer(
         if (context is Activity) {
             context.runOnUiThread {
                 if (isError.not()) {
-                    completedCallback?.invoke()
+                    completedCallback?.invoke(generateFilePath)
                 } else {
                     errorCallback?.invoke()
                 }
@@ -524,12 +523,14 @@ class VideoRenderer(
 
     private fun MediaFormat.isSupportedAudio() = this.getString(KEY_MIME) == MIMETYPE_AUDIO_AAC
 
-    private fun getOutputFilePath() =
-        context.resources.getString(
+    private fun getOutputFilePath(): String {
+        generateFilePath = context.resources.getString(
             R.string.output_file_name,
             Environment.getExternalStorageDirectory().absolutePath,
             VideoUtils.getOutputName()
         )
+        return generateFilePath
+    }
 
     private fun logIt(message: String) {
         if (isDebugEnabled) {
