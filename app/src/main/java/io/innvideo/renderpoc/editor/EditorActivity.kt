@@ -1,9 +1,11 @@
 package io.innvideo.renderpoc.editor
 
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.toBitmap
@@ -18,11 +20,13 @@ import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseMod
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
 import io.innvideo.renderpoc.editor.video_renderer.VideoRenderer
+import io.innvideo.renderpoc.editor.video_renderer.size
 import kotlinx.android.synthetic.main.activity_editor.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 
 class EditorActivity : AppCompatActivity() {
@@ -31,7 +35,7 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var renderer: EditorRenderer
 
-    private lateinit var sharableFilepath: String
+    private lateinit var renderedVideoFilePath: String
 
     private var touchListener = View.OnTouchListener { v, event ->
         // Convert touch coordinates into normalized device
@@ -56,13 +60,8 @@ class EditorActivity : AppCompatActivity() {
             val thread = Thread(Runnable {
                 VideoRenderer(this, uiData)
                     .withAudio()
-                    .onCompleted {
-                        sharableFilepath = it
-                        group.visibility = View.GONE
-                        tvShare.visibility = View.VISIBLE
-                        toastIt("Video Rendered")
-                    }
-                    .onError { toastIt("Failed to create video") }
+                    .onCompleted(::onRenderSuccess)
+                    .onError(::onRenderFailed)
                     .enableDebug(BuildConfig.DEBUG)
                     .render()
             })
@@ -70,12 +69,64 @@ class EditorActivity : AppCompatActivity() {
         }
     }
 
+    private fun onRenderFailed() {
+        showFailedDialog()
+        group.visibility = View.GONE
+    }
+
+    private fun onRenderSuccess(path: String) {
+        renderedVideoFilePath = path
+        group.visibility = View.GONE
+        tvShare.visibility = View.VISIBLE
+        showSuccessDialog()
+    }
+
+    private fun showFailedDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setCancelable(false)
+        builder.setTitle("Video Failed!! \uD83D\uDE2D")
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog?.dismiss() }
+        builder.create().show()
+    }
+
+    private fun showSuccessDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setCancelable(false)
+        builder.setTitle("Video Created!! \uD83D\uDC4D")
+        builder.setMessage(getFileDetails())
+        builder.setPositiveButton("Share") { _, _ -> shareVideo() }
+        builder.setNegativeButton("Cancel") { dialog, _ -> dialog?.dismiss() }
+        builder.create().show()
+    }
+
+    private fun getFileDetails(): String {
+        val builder = StringBuilder()
+        val file = File(renderedVideoFilePath)
+        if (file.exists()) {
+            builder.append("SIZE : ${file.size()}\n")
+        }
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(renderedVideoFilePath)
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.let {
+            builder.append("DURATION : ${it.toFloat() / 1000f}\n")
+        }
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.let { width ->
+            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
+                ?.let { height ->
+                    builder.append("RESOLUTION : $width x ${height}\n")
+                }
+        }
+        retriever.release()
+        return builder.toString()
+    }
+
     private fun shareVideo() {
-        val sharingIntent = Intent(Intent.ACTION_SEND)
-        val screenshotUri: Uri = Uri.parse(sharableFilepath)
-        sharingIntent.type = "video/mp4"
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, screenshotUri)
-        startActivity(Intent.createChooser(sharingIntent, "Share using"))
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            Uri.parse(renderedVideoFilePath)
+            type = "video/mp4"
+            putExtra(Intent.EXTRA_STREAM, renderedVideoFilePath)
+        }
+        startActivity(Intent.createChooser(intent, "Share using"))
     }
 
     private fun start() {

@@ -3,6 +3,7 @@ package io.innvideo.renderpoc.editor.video_renderer
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.text.format.DateFormat
+import java.io.File
 import java.util.*
 
 
@@ -60,4 +61,26 @@ object VideoUtils {
         cal.timeInMillis = System.currentTimeMillis()
         return "${DateFormat.format("dd_MMM_yyyy_hh_mm_ss_aaa", cal)}"
     }
+}
+
+fun File.size(): String {
+    val divideBy = 1000f
+    val size = this.length().toFloat()
+    var s = ""
+    val kb = (size / divideBy).toDouble()
+    val mb = kb / divideBy
+    val gb = mb / divideBy
+    val tb = gb / divideBy
+    if (size < divideBy) {
+        s = "$size Bytes"
+    } else if (size >= divideBy && size < divideBy * divideBy) {
+        s = String.format("%.2f", kb) + " KB"
+    } else if (size >= divideBy * divideBy && size < divideBy * divideBy * divideBy) {
+        s = String.format("%.2f", mb) + " MB"
+    } else if (size >= divideBy * divideBy * divideBy && size < divideBy * divideBy * divideBy * divideBy) {
+        s = String.format("%.2f", gb) + " GB"
+    } else if (size >= divideBy * divideBy * divideBy * divideBy) {
+        s = String.format("%.2f", tb) + " TB"
+    }
+    return s
 }
