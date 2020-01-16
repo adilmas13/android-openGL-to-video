@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.system.measureTimeMillis
 
 
 class EditorActivity : AppCompatActivity() {
@@ -54,19 +55,18 @@ class EditorActivity : AppCompatActivity() {
         tvShare.setOnClickListener { shareVideo() }
         canvas.setOnTouchListener(touchListener)
         canvas.onSurfaceTextureAvailable { _, _, _ -> start() }
-        btnExport.setOnClickListener {
-            group.visibility = View.VISIBLE
-            tvShare.visibility = View.GONE
-            val thread = Thread(Runnable {
-                VideoRenderer(this, uiData)
-                    .withAudio()
-                    .onCompleted(::onRenderSuccess)
-                    .onError(::onRenderFailed)
-                    .enableDebug(BuildConfig.DEBUG)
-                    .render()
-            })
-            thread.start()
-        }
+        btnExport.setOnClickListener { exportVideo() }
+    }
+
+    private fun exportVideo() {
+        group.visibility = View.VISIBLE
+        tvShare.visibility = View.GONE
+        VideoRenderer(this@EditorActivity, uiData)
+            .withAudio()
+            .onCompleted(::onRenderSuccess)
+            .onError(::onRenderFailed)
+            .enableDebug(BuildConfig.DEBUG)
+            .render()
     }
 
     private fun onRenderFailed() {
@@ -108,7 +108,7 @@ class EditorActivity : AppCompatActivity() {
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(renderedVideoFilePath)
         retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.let {
-            builder.append("DURATION : ${it.toFloat() / 1000f}\n")
+            builder.append("DURATION : ${it.toFloat() / 1000f} secs\n")
         }
         retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.let { width ->
             retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
@@ -132,6 +132,7 @@ class EditorActivity : AppCompatActivity() {
     private fun start() {
         progress.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
+            measureTimeMillis { }
             val response = fetchJsonResponse()
             if (response != null) {
                 uiData = EditorDataParser(this@EditorActivity, response).parse()

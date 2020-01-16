@@ -2,6 +2,7 @@ package io.innvideo.renderpoc.editor
 
 import android.content.Context
 import android.opengl.GLES10.GL_COLOR_BUFFER_BIT
+import android.opengl.GLES10.GL_DEPTH_BUFFER_BIT
 import android.opengl.GLES10.glClear
 import android.opengl.GLES10.glClearColor
 import android.os.Bundle
@@ -32,9 +33,9 @@ class VideoRendererContainer(
             var counter = 0
             openGLCore.init()
             layers.addAll(uiData.layers)
-            while (counter++ < 600) {
+            while (counter++ < 500) {
                 logIt("RENDERING AT => $counter")
-                if (counter < 20) renderOnScreen()
+               if (counter < 10) renderOnScreen()
                 sleep(33)
             }
             logIt("UI RENDERING COMPLETED => ")
@@ -48,8 +49,9 @@ class VideoRendererContainer(
     }
 
     private fun renderOnScreen() {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
         glClear(GL_COLOR_BUFFER_BIT)
+        glClear(GL_DEPTH_BUFFER_BIT)
         layers.forEach { layer ->
             when (layer) {
                 is LayerData.Image -> ImageTexture(context, layer).draw()

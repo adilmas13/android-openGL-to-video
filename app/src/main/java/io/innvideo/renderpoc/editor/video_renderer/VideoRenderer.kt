@@ -1,6 +1,5 @@
 package io.innvideo.renderpoc.editor.video_renderer
 
-import android.app.Activity
 import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -25,7 +24,12 @@ import android.util.Log
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.VideoRendererContainer
 import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
+import kotlin.system.measureTimeMillis
 
 class VideoRenderer(
     private val context: Context,
@@ -74,10 +78,15 @@ class VideoRenderer(
     }
 
     fun render() {
-        if (audioExist) {
-            renderWithAudio()
-        } else {
-            renderOnlyWithVideo()
+        CoroutineScope(Dispatchers.IO).launch {
+            val timeTaken = measureTimeMillis {
+                if (audioExist) {
+                    renderWithAudio()
+                } else {
+                    renderOnlyWithVideo()
+                }
+            }
+            logIt("TIME TAKEN => ${timeTaken.toFloat() / 1000f}secs")
         }
     }
 
@@ -137,7 +146,7 @@ class VideoRenderer(
         throw IllegalStateException("'$type' track not found")
     }
 
-    private fun renderWithAudio() {
+    private  suspend fun renderWithAudio() {
         errorWrapper {
             // first extract the audio track
             val mediaExtractor = MediaExtractor().apply { setDataSource(uiData.audioData.url) }
@@ -179,7 +188,7 @@ class VideoRenderer(
         return hasAudioToEncode
     }
 
-    private fun convertAudioToSupportedFormatAndRenderVideo(
+    private suspend fun convertAudioToSupportedFormatAndRenderVideo(
         oldAudioFormat: MediaFormat,
         extractor: MediaExtractor
     ) {
@@ -209,8 +218,8 @@ class VideoRenderer(
                 }
 
             val muxer = MediaMuxer(getOutputFilePath(), MUXER_OUTPUT_FORMAT)
-            var videoTrackIndex = -1; // muxer.addTrack(videoFormat)
-            var audioTrackIndex = -1;//muxer.addTrack(audioFormat)
+            var videoTrackIndex = -1    // muxer.addTrack(videoFormat)
+            var audioTrackIndex = -1    //muxer.addTrack(audioFormat)
             var isCompleted = false
             val inputSurface = videoEncoder.createInputSurface()
             val thread = VideoRendererContainer(
@@ -228,9 +237,9 @@ class VideoRenderer(
             audioEncoder.start()
             videoEncoder.start()
             thread.start()
-            var muxerCounter = 0
+            var muxerCounter = 1
             var hasAudioToEncode: Boolean
-            var isVideoEncodingCompleted = false
+            var isVideoEncodingCompleted = true
             while (isCompleted.not() || isVideoEncodingCompleted.not()) {
 
                 /** get audio decoder input buffer **/
@@ -238,36 +247,36 @@ class VideoRenderer(
                 // end of if
                 var audioDecoderOutputAvailable = true
                 while (hasAudioToEncode || audioDecoderOutputAvailable) {
-                    val videoEncoderBufferId =
-                        videoEncoder.dequeueOutputBuffer(videoBufferInfo, TIME_OUT)
+                    /*  val videoEncoderBufferId =
+                          videoEncoder.dequeueOutputBuffer(videoBufferInfo, TIME_OUT)
 
-                    when (videoEncoderBufferId) {
-                        MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                            Log.d("TEST", "ADDING VIDEO TRACK")
-                            videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
-                            ++muxerCounter
-                            if (muxerCounter == 2) muxer.start()
-                            //   muxer.start()
-                        } // INFO_OUTPUT_FORMAT_CHANGED
-                        MediaCodec.INFO_TRY_AGAIN_LATER -> Log.d("TEST", "VIDEO ENCODER TRY AGAIN")
+                      when (videoEncoderBufferId) {
+                          MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                              Log.d("TEST", "ADDING VIDEO TRACK")
+                              videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
+                              ++muxerCounter
+                              if (muxerCounter == 2) muxer.start()
+                              //   muxer.start()
+                          } // INFO_OUTPUT_FORMAT_CHANGED
+                          MediaCodec.INFO_TRY_AGAIN_LATER -> Log.d("TEST", "VIDEO ENCODER TRY AGAIN")
 
-                        MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> Log.d(
-                            "TEST",
-                            "VIDEO ENCODER INFO_OUTPUT_BUFFERS_CHANGED"
-                        )
-                        else -> {
-                            if (muxerCounter == 2) {
-                                val byteBuffer = videoEncoder.getOutputBuffer(videoEncoderBufferId)
-                                if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                                    videoBufferInfo.size = 0
-                                }
-                                byteBuffer?.position(videoBufferInfo.offset)
-                                byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
-                                muxer.writeSampleData(
+                          MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> Log.d(
+                              "TEST",
+                              "VIDEO ENCODER INFO_OUTPUT_BUFFERS_CHANGED"
+                          )
+                          else -> {
+                              if (muxerCounter == 2) {
+                                  val byteBuffer = videoEncoder.getOutputBuffer(videoEncoderBufferId)
+                                  if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+                                      videoBufferInfo.size = 0
+                                  }
+                                  byteBuffer?.position(videoBufferInfo.offset)
+                                  byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
+                                *//*  muxer.writeSampleData(
                                     videoTrackIndex,
                                     byteBuffer!!,
                                     videoBufferInfo
-                                )
+                                )*//*
                                 Log.d("TEST", "WRITING IN VIDEO => $videoTrackIndex")
                                 videoEncoder.releaseOutputBuffer(videoEncoderBufferId, false)
                                 if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -275,7 +284,7 @@ class VideoRenderer(
                                 }
                             }
                         } // else in when
-                    }
+                    }*/
 
                     val audioEncoderBufferId =
                         audioEncoder.dequeueOutputBuffer(audioBufferInfo, TIME_OUT)
@@ -372,7 +381,7 @@ class VideoRenderer(
         }
     }
 
-    private fun renderWithSupportedAudioFormat(
+    private suspend fun renderWithSupportedAudioFormat(
         mediaExtractor: MediaExtractor,
         audioFormat: MediaFormat
     ) {
@@ -442,7 +451,7 @@ class VideoRenderer(
         }
     }
 
-    private fun renderOnlyWithVideo() {
+    private suspend fun renderOnlyWithVideo() {
         executeSafely {
             val videoFormat = getVideoFormat()
             val videoEncoder = MediaCodec.createEncoderByType(VIDEO_MIME_TYPE)
@@ -489,16 +498,16 @@ class VideoRenderer(
         }
     }
 
-    private fun errorWrapper(body: () -> Unit) {
+    private suspend fun errorWrapper(block: suspend () -> Unit) {
         try {
-            body.invoke()
+            block()
         } catch (e: Exception) {
             e.printStackTrace()
             sendErrorOrCompletionCallback(true)
         }
     }
 
-    private fun executeSafely(body: () -> Unit) {
+    private suspend inline fun executeSafely(body: () -> Unit) {
         var isError = false
         try {
             body.invoke()
@@ -509,14 +518,12 @@ class VideoRenderer(
         sendErrorOrCompletionCallback(isError)
     }
 
-    private fun sendErrorOrCompletionCallback(isError: Boolean) {
-        if (context is Activity) {
-            context.runOnUiThread {
-                if (isError.not()) {
-                    completedCallback?.invoke(generateFilePath)
-                } else {
-                    errorCallback?.invoke()
-                }
+    private suspend inline fun sendErrorOrCompletionCallback(isError: Boolean) {
+        withContext(Dispatchers.Main) {
+            if (isError.not()) {
+                completedCallback?.invoke(generateFilePath)
+            } else {
+                errorCallback?.invoke()
             }
         }
     }
