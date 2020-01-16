@@ -34,7 +34,7 @@ class VideoRendererContainer(
             openGLCore.init()
             layers.addAll(uiData.layers)
             while (counter++ < 500) {
-                logIt("RENDERING AT => $counter")
+//                logIt("RENDERING AT => $counter")
                if (counter < 10) renderOnScreen()
                 sleep(33)
             }

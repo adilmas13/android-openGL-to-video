@@ -24,6 +24,7 @@ import android.util.Log
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.VideoRendererContainer
 import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
+import io.innvideo.renderpoc.editor.openGL.utils.OpenGLLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -146,11 +147,11 @@ class VideoRenderer(
         throw IllegalStateException("'$type' track not found")
     }
 
-    private  suspend fun renderWithAudio() {
+    private suspend fun renderWithAudio() {
         errorWrapper {
             // first extract the audio track
             val mediaExtractor = MediaExtractor()
-            withContext(Dispatchers.IO){mediaExtractor.setDataSource(uiData.audioData.url)}
+            withContext(Dispatchers.IO) { mediaExtractor.setDataSource(uiData.audioData.url) }
             val audioFormat = getTrackFormat(mediaExtractor, TYPE_AUDIO)
 
             if (audioFormat.isSupportedAudio()) {
@@ -188,6 +189,7 @@ class VideoRenderer(
         }
         return hasAudioToEncode
     }
+
 
     private suspend fun convertAudioToSupportedFormatAndRenderVideo(
         oldAudioFormat: MediaFormat,
@@ -233,79 +235,86 @@ class VideoRenderer(
             }
             val videoBufferInfo = MediaCodec.BufferInfo()
             val audioBufferInfo = MediaCodec.BufferInfo()
-
+            thread.start()
             audioDecoder.start()
             audioEncoder.start()
             videoEncoder.start()
-            thread.start()
-            var muxerCounter = 1
+
+            var muxerCounter = 0
             var hasAudioToEncode: Boolean
-            var isVideoEncodingCompleted = true
-            while (isCompleted.not() || isVideoEncodingCompleted.not()) {
+            while (isCompleted.not()) {
 
                 /** get audio decoder input buffer **/
-                hasAudioToEncode = decodeAudioFromMediaExtractor(audioDecoder, extractor)
-                // end of if
-                var audioDecoderOutputAvailable = true
-                while (hasAudioToEncode || audioDecoderOutputAvailable) {
-                    /*  val videoEncoderBufferId =
-                          videoEncoder.dequeueOutputBuffer(videoBufferInfo, TIME_OUT)
-
-                      when (videoEncoderBufferId) {
-                          MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                              Log.d("TEST", "ADDING VIDEO TRACK")
-                              videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
-                              ++muxerCounter
-                              if (muxerCounter == 2) muxer.start()
-                              //   muxer.start()
-                          } // INFO_OUTPUT_FORMAT_CHANGED
-                          MediaCodec.INFO_TRY_AGAIN_LATER -> Log.d("TEST", "VIDEO ENCODER TRY AGAIN")
-
-                          MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> Log.d(
-                              "TEST",
-                              "VIDEO ENCODER INFO_OUTPUT_BUFFERS_CHANGED"
-                          )
-                          else -> {
-                              if (muxerCounter == 2) {
-                                  val byteBuffer = videoEncoder.getOutputBuffer(videoEncoderBufferId)
-                                  if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
-                                      videoBufferInfo.size = 0
-                                  }
-                                  byteBuffer?.position(videoBufferInfo.offset)
-                                  byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
-                                *//*  muxer.writeSampleData(
-                                    videoTrackIndex,
-                                    byteBuffer!!,
-                                    videoBufferInfo
-                                )*//*
-                                Log.d("TEST", "WRITING IN VIDEO => $videoTrackIndex")
-                                videoEncoder.releaseOutputBuffer(videoEncoderBufferId, false)
-                                if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                                    isVideoEncodingCompleted = true
-                                }
-                            }
-                        } // else in when
-                    }*/
-
-                    val audioEncoderBufferId =
-                        audioEncoder.dequeueOutputBuffer(audioBufferInfo, TIME_OUT)
-                    logIt("audioEncoderBufferId => $audioEncoderBufferId")
-
-                    when (audioEncoderBufferId) {
+                // hasAudioToEncode = decodeAudioFromMediaExtractor(audioDecoder, extractor)
+                // video encoder
+                videoEncoderLoop@ while (true) {
+                    val videoEncoderBufferId =
+                        videoEncoder.dequeueOutputBuffer(videoBufferInfo, TIME_OUT)
+                    Log.d("TEST", "videoEncoderBufferId => $videoEncoderBufferId")
+                    when (videoEncoderBufferId) {
                         MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                            Log.d("TEST", "ADDING AUDIO TRACK")
-                            audioTrackIndex = muxer.addTrack(audioEncoder.outputFormat)
+                            Log.d("TEST", "ADDING VIDEO TRACK")
+                            videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
                             ++muxerCounter
                             if (muxerCounter == 2) muxer.start()
-                        }
+                            if (muxerCounter == 1) {
+                                break@videoEncoderLoop
+                            }
+                            //   muxer.start()
+                        } // INFO_OUTPUT_FORMAT_CHANGED
                         MediaCodec.INFO_TRY_AGAIN_LATER -> {
-                            logIt("AUDIO ENCODER TRY AGAIN")
-                            hasAudioToEncode = false
+                            Log.d("TEST", "VIDEO ENCODER TRY AGAIN")
+                            if (muxerCounter == 1) {
+                                break@videoEncoderLoop
+                            }
                         }
-                        MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED ->
-                            logIt("AUDIO ENCODER INFO_OUTPUT_BUFFERS_CHANGED")
+                        MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> Log.d(
+                            "TEST",
+                            "VIDEO ENCODER INFO_OUTPUT_BUFFERS_CHANGED"
+                        )
                         else -> {
-                            if (muxerCounter == 2) {
+                            val byteBuffer = videoEncoder.getOutputBuffer(videoEncoderBufferId)
+                            if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
+                                videoBufferInfo.size = 0
+                            }
+                            byteBuffer?.position(videoBufferInfo.offset)
+                            byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
+                            muxer.writeSampleData(
+                                videoTrackIndex,
+                                byteBuffer!!,
+                                videoBufferInfo
+                            )
+                            Log.d("TEST", "WRITING IN VIDEO => $videoTrackIndex")
+                            videoEncoder.releaseOutputBuffer(videoEncoderBufferId, false)
+                            if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                                break@videoEncoderLoop
+                            }
+                        } // else in when
+                    }
+                } // end of while for video encoder
+                // audio encoder
+                hasAudioToEncode = decodeAudioFromMediaExtractor(audioDecoder, extractor)
+                if (hasAudioToEncode) {
+                    audioEncoderLoop@ while (true) {
+
+                        val audioEncoderBufferId =
+                            audioEncoder.dequeueOutputBuffer(audioBufferInfo, TIME_OUT)
+                        Log.d("TEST", "audioEncoderBufferId => $audioEncoderBufferId")
+
+                        when (audioEncoderBufferId) {
+                            MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                                Log.d("TEST", "ADDING AUDIO TRACK")
+                                audioTrackIndex = muxer.addTrack(audioEncoder.outputFormat)
+                                ++muxerCounter
+                                if (muxerCounter == 2) muxer.start()
+                            }
+                            MediaCodec.INFO_TRY_AGAIN_LATER -> {
+                                OpenGLLogger.logIt("AUDIO ENCODER TRY AGAIN")
+                                break@audioEncoderLoop
+                            }
+                            MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED ->
+                                OpenGLLogger.logIt("AUDIO ENCODER INFO_OUTPUT_BUFFERS_CHANGED")
+                            else -> {
                                 val encodedBuffer =
                                     audioEncoder.getOutputBuffer(audioEncoderBufferId)!!
                                 Log.d("TEST", "WRITING IN AUDIO => $audioTrackIndex")
@@ -316,10 +325,8 @@ class VideoRenderer(
                                 )
                                 audioEncoder.releaseOutputBuffer(audioEncoderBufferId, false)
                             }
-                        }
-                    } // end of when audioEncoderBufferId
-
-                    /** releasing audio encoder ***/
+                        } // end of when audioEncoderBufferId
+                    } // end of while loop for audioEncoder draining
                     val audioDecoderBufferId =
                         audioDecoder.dequeueOutputBuffer(audioBufferInfo, TIME_OUT)
                     logIt("audioDecoderBuffer => $audioDecoderBufferId")
@@ -356,12 +363,10 @@ class VideoRenderer(
 
                     } else if (audioDecoderBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                         logIt("AUDIO DECODER TRY AGAIN")
-                        audioDecoderOutputAvailable = false
                     }
-                }// end of while hasAudioToEncode
-                /** video encoder + audio encoder ***/
+                } // end of hasAudioToEncode
 
-            } // while isCompleted loop
+            } // end of parent while loop
 
             muxer.apply {
                 stop()
@@ -382,6 +387,46 @@ class VideoRenderer(
         }
     }
 
+
+    /*
+    * /** releasing audio encoder ***/
+                val audioDecoderBufferId =
+                    audioDecoder.dequeueOutputBuffer(audioBufferInfo, TIME_OUT)
+                logIt("audioDecoderBuffer => $audioDecoderBufferId")
+                if (audioDecoderBufferId >= 0) {
+                    val outBuffer = audioDecoder.getOutputBuffer(audioDecoderBufferId)!!
+
+                    // If needed, process decoded data here
+                    // ...
+
+                    // We drained the audioEncoder, so there should be input buffer
+                    // available. If this is not the case, we get a NullPointerException
+                    // when touching inBuffer
+                    val inBufferId = audioEncoder.dequeueInputBuffer(TIME_OUT)
+                    Log.d("TEST", "inBuffer $inBufferId")
+                    val inBuffer = audioEncoder.getInputBuffer(inBufferId)!!
+
+                    // Copy buffers - audioDecoder output goes to audioEncoder input
+                    inBuffer.put(outBuffer)
+
+                    // Feed audioEncoder
+                    audioEncoder.queueInputBuffer(
+                        inBufferId,
+                        audioBufferInfo.offset,
+                        audioBufferInfo.size,
+                        audioBufferInfo.presentationTimeUs,
+                        audioBufferInfo.flags
+                    )
+
+                    audioDecoder.releaseOutputBuffer(audioDecoderBufferId, false)
+
+                    // Did we get all output from audioDecoder?
+                    /*  if ((audioBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0)
+                          allInputDecoded = true*/
+
+                } else if (audioDecoderBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                    logIt("AUDIO DECODER TRY AGAIN")
+                }*/
     private suspend fun renderWithSupportedAudioFormat(
         mediaExtractor: MediaExtractor,
         audioFormat: MediaFormat
