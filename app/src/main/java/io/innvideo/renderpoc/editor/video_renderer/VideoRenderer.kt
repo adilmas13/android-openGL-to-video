@@ -149,7 +149,8 @@ class VideoRenderer(
     private  suspend fun renderWithAudio() {
         errorWrapper {
             // first extract the audio track
-            val mediaExtractor = MediaExtractor().apply { setDataSource(uiData.audioData.url) }
+            val mediaExtractor = MediaExtractor()
+            withContext(Dispatchers.IO){mediaExtractor.setDataSource(uiData.audioData.url)}
             val audioFormat = getTrackFormat(mediaExtractor, TYPE_AUDIO)
 
             if (audioFormat.isSupportedAudio()) {
