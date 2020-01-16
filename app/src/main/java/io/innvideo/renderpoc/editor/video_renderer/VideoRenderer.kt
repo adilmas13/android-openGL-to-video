@@ -242,8 +242,13 @@ class VideoRenderer(
 
             var muxerCounter = 0
             var hasAudioToEncode: Boolean
+            var muxing = false
             while (isCompleted.not()) {
 
+                if (muxerCounter == 2 && muxing.not()) {
+                    muxer.start()
+                    muxing = true
+                }
                 /** get audio decoder input buffer **/
                 // hasAudioToEncode = decodeAudioFromMediaExtractor(audioDecoder, extractor)
                 // video encoder
@@ -256,29 +261,28 @@ class VideoRenderer(
                             Log.d("TEST", "ADDING VIDEO TRACK")
                             videoTrackIndex = muxer.addTrack(videoEncoder.outputFormat)
                             ++muxerCounter
-                            if (muxerCounter == 2) muxer.start()
-                            if (muxerCounter == 1) {
-                                break@videoEncoderLoop
-                            }
-                            //   muxer.start()
                         } // INFO_OUTPUT_FORMAT_CHANGED
                         MediaCodec.INFO_TRY_AGAIN_LATER -> {
                             Log.d("TEST", "VIDEO ENCODER TRY AGAIN")
-                            if (muxerCounter == 1) {
+                            break@videoEncoderLoop
+                        }
+                        else -> {
+                            if (!muxing) {
                                 break@videoEncoderLoop
                             }
-                        }
-                        MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED -> Log.d(
-                            "TEST",
-                            "VIDEO ENCODER INFO_OUTPUT_BUFFERS_CHANGED"
-                        )
-                        else -> {
                             val byteBuffer = videoEncoder.getOutputBuffer(videoEncoderBufferId)
                             if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                                 videoBufferInfo.size = 0
                             }
                             byteBuffer?.position(videoBufferInfo.offset)
                             byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
+                            Log.d(
+                                "BUFFER_IT",
+                                "VIDEO FLAG - ${videoBufferInfo.flags} " +
+                                        "- SIZE - ${videoBufferInfo.size} " +
+                                        "- OFFSET - ${videoBufferInfo.offset} " +
+                                        "- TIME - ${videoBufferInfo.presentationTimeUs}"
+                            )
                             muxer.writeSampleData(
                                 videoTrackIndex,
                                 byteBuffer!!,
@@ -294,7 +298,9 @@ class VideoRenderer(
                 } // end of while for video encoder
                 // audio encoder
                 hasAudioToEncode = decodeAudioFromMediaExtractor(audioDecoder, extractor)
+                Log.d("HERE", "hasAudio ${hasAudioToEncode}")
                 if (hasAudioToEncode) {
+                    Log.d("AUDIO_BUFFER", "hasAudio")
                     audioEncoderLoop@ while (true) {
 
                         val audioEncoderBufferId =
@@ -306,18 +312,25 @@ class VideoRenderer(
                                 Log.d("TEST", "ADDING AUDIO TRACK")
                                 audioTrackIndex = muxer.addTrack(audioEncoder.outputFormat)
                                 ++muxerCounter
-                                if (muxerCounter == 2) muxer.start()
+                                break@audioEncoderLoop
                             }
                             MediaCodec.INFO_TRY_AGAIN_LATER -> {
                                 OpenGLLogger.logIt("AUDIO ENCODER TRY AGAIN")
                                 break@audioEncoderLoop
                             }
-                            MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED ->
-                                OpenGLLogger.logIt("AUDIO ENCODER INFO_OUTPUT_BUFFERS_CHANGED")
                             else -> {
+                                if (!muxing) {
+                                    break@audioEncoderLoop
+                                }
                                 val encodedBuffer =
                                     audioEncoder.getOutputBuffer(audioEncoderBufferId)!!
-                                Log.d("TEST", "WRITING IN AUDIO => $audioTrackIndex")
+                                Log.d(
+                                    "BUFFER_IT",
+                                    "AUDIO FLAG - ${audioBufferInfo.flags} " +
+                                            "- SIZE - ${audioBufferInfo.size} " +
+                                            "- OFFSET - ${audioBufferInfo.offset} " +
+                                            "- TIME - ${audioBufferInfo.presentationTimeUs}"
+                                )
                                 muxer.writeSampleData(
                                     audioTrackIndex,
                                     encodedBuffer,
@@ -351,7 +364,7 @@ class VideoRenderer(
                             inBufferId,
                             audioBufferInfo.offset,
                             audioBufferInfo.size,
-                            audioBufferInfo.presentationTimeUs,
+                            System.nanoTime() / 1000,
                             audioBufferInfo.flags
                         )
 

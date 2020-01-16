@@ -33,9 +33,9 @@ class VideoRendererContainer(
             var counter = 0
             openGLCore.init()
             layers.addAll(uiData.layers)
-            while (counter++ < 500) {
+            while (counter++ < 100) {
 //                logIt("RENDERING AT => $counter")
-               if (counter < 10) renderOnScreen()
+                renderOnScreen()
                 sleep(33)
             }
             logIt("UI RENDERING COMPLETED => ")
