@@ -38,6 +38,7 @@ class VideoRenderer(
     private var audioExist = false
     private var isDebugEnabled = false
     private var completedCallback: ((filePath: String) -> Unit)? = null
+    private var progressCallback: ((progress: Int) -> Unit)? = null
     private var errorCallback: (() -> Unit)? = null
     private lateinit var generateFilePath: String
 
@@ -68,6 +69,11 @@ class VideoRenderer(
 
     fun onCompleted(callback: (String) -> Unit): VideoRenderer {
         this.completedCallback = callback
+        return this
+    }
+
+    fun onProgress(callback: (Int) -> Unit): VideoRenderer {
+        this.progressCallback = callback
         return this
     }
 
@@ -229,7 +235,6 @@ class VideoRenderer(
                 inputSurface
             ) {
                 videoEncoder.signalEndOfInputStream()
-                isCompleted = true
             }
             val videoBufferInfo = MediaCodec.BufferInfo()
             val audioBufferInfo = MediaCodec.BufferInfo()
@@ -241,8 +246,9 @@ class VideoRenderer(
             var muxerCounter = 0
             var hasAudioToEncode: Boolean
             var muxing = false
+            var timeLimitInSeconds = 15
+            var startTime = 0L
             while (isCompleted.not()) {
-
                 if (muxerCounter == TRACK_COUNT && muxing.not()) {
                     muxer.start()
                     muxing = true
@@ -265,6 +271,17 @@ class VideoRenderer(
                             if (videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                                 videoBufferInfo.size = 0
                             }
+                            if (startTime == 0L) {
+                                startTime = videoBufferInfo.presentationTimeUs
+                            }
+                            val currentTime = videoBufferInfo.presentationTimeUs
+                            Log.d("TIMING", ((currentTime - startTime) / 1000000).toString())
+                            if (((currentTime - startTime) / 1000000) >= timeLimitInSeconds) {
+                                thread.release()
+                                videoEncoder.signalEndOfInputStream()
+                            }
+                            Log.d("TIME", videoBufferInfo.presentationTimeUs.toString())
+                            Log.d("TIME", "NANO " + System.nanoTime() / 1000)
                             byteBuffer?.position(videoBufferInfo.offset)
                             byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
                             muxer.writeSampleData(
@@ -274,6 +291,7 @@ class VideoRenderer(
                             )
                             videoEncoder.releaseOutputBuffer(videoEncoderBufferId, false)
                             if ((videoBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                                isCompleted = true
                                 break@videoEncoderLoop
                             }
                         } // else in when

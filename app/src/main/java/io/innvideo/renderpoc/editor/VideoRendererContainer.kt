@@ -7,6 +7,7 @@ import android.opengl.GLES10.glClear
 import android.opengl.GLES10.glClearColor
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYER
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYERS
 import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
@@ -28,13 +29,14 @@ class VideoRendererContainer(
 
     private val layers = mutableListOf<LayerData>()
 
+    private var isRunning = true
+
     override fun run() {
         try {
-            var counter = 0
             openGLCore.init()
             layers.addAll(uiData.layers)
-            while (counter++ < 100) {
-//                logIt("RENDERING AT => $counter")
+            while (isRunning) {
+                Log.d("TEST", "RUNNING")
                 renderOnScreen()
                 sleep(33)
             }
@@ -74,9 +76,10 @@ class VideoRendererContainer(
     }
 
     fun release() {
+        isRunning = false
         openGLCore.release()
-        handler.looper.quit()
-        this.interrupt()
+//        handler.looper.quit()
+      //  this.interrupt()
     }
 
 }
