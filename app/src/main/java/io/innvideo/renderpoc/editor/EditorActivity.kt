@@ -63,14 +63,24 @@ class EditorActivity : AppCompatActivity() {
         tvShare.visibility = View.GONE
         VideoRenderer(this@EditorActivity, uiData)
             .withAudio()
+            .onProgress(::onProgressReceived)
             .onCompleted(::onRenderSuccess)
             .onError(::onRenderFailed)
             .enableDebug(BuildConfig.DEBUG)
             .render()
     }
 
+    private fun onProgressReceived(progress: Int) {
+        pbLoader.setProgress(progress, true)
+        tvProgress.text = resources.getString(
+            R.string.progress_in_percentage,
+            progress.toString()
+        )
+    }
+
     private fun onRenderFailed() {
         showFailedDialog()
+        resetProgress()
         group.visibility = View.GONE
     }
 
@@ -79,6 +89,12 @@ class EditorActivity : AppCompatActivity() {
         group.visibility = View.GONE
         tvShare.visibility = View.VISIBLE
         showSuccessDialog()
+        resetProgress()
+    }
+
+    private fun resetProgress() {
+        pbLoader.progress = 0
+        tvProgress.text = ""
     }
 
     private fun showFailedDialog() {

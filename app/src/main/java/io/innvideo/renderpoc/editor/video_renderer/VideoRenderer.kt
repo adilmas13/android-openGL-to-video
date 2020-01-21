@@ -275,13 +275,11 @@ class VideoRenderer(
                                 startTime = videoBufferInfo.presentationTimeUs
                             }
                             val currentTime = videoBufferInfo.presentationTimeUs
-                            Log.d("TIMING", ((currentTime - startTime) / 1000000).toString())
+                            sendProgress(currentTime - startTime, timeLimitInSeconds)
                             if (((currentTime - startTime) / 1000000) >= timeLimitInSeconds) {
                                 thread.release()
                                 videoEncoder.signalEndOfInputStream()
                             }
-                            Log.d("TIME", videoBufferInfo.presentationTimeUs.toString())
-                            Log.d("TIME", "NANO " + System.nanoTime() / 1000)
                             byteBuffer?.position(videoBufferInfo.offset)
                             byteBuffer?.limit(videoBufferInfo.offset + videoBufferInfo.size)
                             muxer.writeSampleData(
@@ -492,6 +490,16 @@ class VideoRenderer(
             mediaMuxer.release()
             videoEncoder.stop()
             videoEncoder.release()
+        }
+    }
+
+    private suspend fun sendProgress(currentTime: Long, videoLimitIsSecs: Int) {
+        val videoLimit = videoLimitIsSecs * 1000000
+        val progress = (currentTime * 100) / videoLimit
+        if (progress in 1..100) {
+            withContext(Dispatchers.Main) {
+                progressCallback?.invoke(progress.toInt())
+            }
         }
     }
 

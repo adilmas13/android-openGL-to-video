@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">RenderTest</string>
     <string name="output_file_name">%1$s/aa/%2$s.mp4</string>
+    <string name="progress_in_percentage">%1$s%%</string>
     <string name="preview">Preview</string>
     <string name="export">Export</string>
     <string name="share">Share</string>
