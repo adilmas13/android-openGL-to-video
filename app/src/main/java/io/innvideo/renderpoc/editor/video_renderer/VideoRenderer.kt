@@ -234,7 +234,6 @@ class VideoRenderer(
                 uiData,
                 inputSurface
             ) {
-                videoEncoder.signalEndOfInputStream()
             }
             val videoBufferInfo = MediaCodec.BufferInfo()
             val audioBufferInfo = MediaCodec.BufferInfo()
@@ -246,7 +245,7 @@ class VideoRenderer(
             var muxerCounter = 0
             var hasAudioToEncode: Boolean
             var muxing = false
-            var timeLimitInSeconds = 15
+            val timeLimitInSeconds = 15
             var startTime = 0L
             while (isCompleted.not()) {
                 if (muxerCounter == TRACK_COUNT && muxing.not()) {
@@ -278,6 +277,7 @@ class VideoRenderer(
                             sendProgress(currentTime - startTime, timeLimitInSeconds)
                             if (((currentTime - startTime) / 1000000) >= timeLimitInSeconds) {
                                 thread.release()
+                                thread.interrupt()
                                 videoEncoder.signalEndOfInputStream()
                             }
                             byteBuffer?.position(videoBufferInfo.offset)
