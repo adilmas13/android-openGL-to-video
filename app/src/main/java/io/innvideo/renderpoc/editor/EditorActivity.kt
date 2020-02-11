@@ -71,7 +71,7 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun onProgressReceived(progress: Int) {
-        pbLoader.setProgress(progress, true)
+        pbLoader.progress = progress
         tvProgress.text = resources.getString(
             R.string.progress_in_percentage,
             progress.toString()
@@ -148,7 +148,6 @@ class EditorActivity : AppCompatActivity() {
     private fun start() {
         progress.visibility = View.VISIBLE
         CoroutineScope(Dispatchers.IO).launch {
-            measureTimeMillis { }
             val response = fetchJsonResponse()
             if (response != null) {
                 uiData = EditorDataParser(this@EditorActivity, response).parse()
