@@ -1,14 +1,18 @@
 package io.innvideo.renderpoc.editor
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.Coil
 import coil.api.load
@@ -21,6 +25,7 @@ import io.innvideo.renderpoc.editor.newModels.response_models.ParentResponseMode
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
 import io.innvideo.renderpoc.editor.videoRenderer.VideoRenderer
+import io.innvideo.renderpoc.editor.videoRenderer.VideoUtils
 import io.innvideo.renderpoc.editor.videoRenderer.size
 import kotlinx.android.synthetic.main.activity_editor.*
 import kotlinx.coroutines.CoroutineScope
@@ -49,14 +54,51 @@ class EditorActivity : AppCompatActivity() {
         true
     }
 
+    companion object {
+        private const val STORAGE_PERMISSION_REQUEST_CODE = 10
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
+        checkForStoragePermission()
         group.visibility = View.GONE
         tvShare.setOnClickListener { shareVideo() }
         canvas.setOnTouchListener(touchListener)
         canvas.onSurfaceTextureAvailable { _, _, _ -> start() }
         btnExport.setOnClickListener { exportVideo() }
+    }
+
+    private fun checkForStoragePermission() {
+        if ((checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED).not()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                STORAGE_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            makeStorageDirectory()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            makeStorageDirectory()
+        } else {
+            toastIt(getString(R.string.storage_permission_required))
+            finish()
+        }
+    }
+
+    private fun makeStorageDirectory() {
+        val directory =
+            File(Environment.getExternalStorageDirectory().absolutePath + File.separator + VideoUtils.DIRECTORY_NAME)
+        directory.mkdirs()
     }
 
     private fun exportVideo() {

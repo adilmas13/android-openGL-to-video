@@ -8,6 +8,9 @@ import java.util.*
 
 
 object VideoUtils {
+
+    const val DIRECTORY_NAME = "render-poc"
+
     fun selectCodec(mimeType: String): MediaCodecInfo? {
         val numCodecs = MediaCodecList.getCodecCount()
         for (i in 0 until numCodecs) {

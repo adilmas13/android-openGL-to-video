@@ -21,13 +21,13 @@ import android.media.MediaFormat.createVideoFormat
 import android.media.MediaMuxer
 import android.os.Environment
 import android.util.Log
-import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.VideoRendererContainer
 import io.innvideo.renderpoc.editor.newModels.parsed_models.MainUiData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.nio.ByteBuffer
 import kotlin.system.measureTimeMillis
 
@@ -43,7 +43,7 @@ class VideoRenderer(
     private lateinit var generateFilePath: String
 
     companion object {
-        private const val LOG_TAG = "LOG_VIDEO"
+        private const val LOG_TAG = "INVIDEO_RENDERER"
 
         private const val TYPE_AUDIO = "audio/"
         private const val VIDEO_WIDTH = 320
@@ -536,11 +536,8 @@ class VideoRenderer(
     private fun MediaFormat.isSupportedAudio() = this.getString(KEY_MIME) == MIMETYPE_AUDIO_AAC
 
     private fun getOutputFilePath(): String {
-        generateFilePath = context.resources.getString(
-            R.string.output_file_name,
-            Environment.getExternalStorageDirectory().absolutePath,
-            VideoUtils.getOutputName()
-        )
+        generateFilePath =
+            Environment.getExternalStorageDirectory().absolutePath + File.separator + VideoUtils.DIRECTORY_NAME + File.separator + VideoUtils.getOutputName() + ".mp4"
         return generateFilePath
     }
 
