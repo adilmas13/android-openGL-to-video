@@ -8,7 +8,7 @@ Read Master JSON from res raw.
 => Use the UiModels to draw on TextureView Using openGL.  
 => OnClick of "export" pass the UiModels to VideoRenderer.  
 => VideoRender generates the video using OpenGl, MediaExtractor, MediaCodec, MediaMuxer.  
-=> Video is saved to local storage under "render-poc" folder.  
+=> Video is saved to local storage under "opengl-to-video" folder.  
 
 ### APIs Used
 - OpenGL : to draw the masterJson on the textureView
