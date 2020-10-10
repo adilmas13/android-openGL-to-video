@@ -176,6 +176,7 @@ class EditorActivity : AppCompatActivity() {
                 }
         }
         retriever.release()
+        builder.append("LOCATION : $renderedVideoFilePath\n")
         return builder.toString()
     }
 
