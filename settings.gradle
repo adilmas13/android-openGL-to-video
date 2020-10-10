@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='Render POC'
+rootProject.name='Android openGL to video'

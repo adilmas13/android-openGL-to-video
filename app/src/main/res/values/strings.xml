@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RenderPoc</string>
+    <string name="app_name">OpenGl To Video</string>
     <string name="progress_in_percentage">%1$s%%</string>
     <string name="preview">Preview</string>
     <string name="export">Export</string>
