@@ -7,10 +7,10 @@ import io.innvideo.renderpoc.editor.constants.EditorConstants.TYPE_AUDIO
 import io.innvideo.renderpoc.editor.constants.EditorConstants.TYPE_COMPOSITE
 import io.innvideo.renderpoc.editor.constants.EditorConstants.TYPE_CUSTOM_BLOCK
 import io.innvideo.renderpoc.editor.constants.EditorConstants.TYPE_TEXT
-import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
-import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
-import io.innvideo.renderpoc.editor.new_models.response_models.BlockResponseModel
-import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseModel
+import io.innvideo.renderpoc.editor.newModels.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.MainUiData
+import io.innvideo.renderpoc.editor.newModels.response_models.BlockResponseModel
+import io.innvideo.renderpoc.editor.newModels.response_models.ParentResponseModel
 
 class EditorDataParser(private val context: Context, private val data: ParentResponseModel) {
 

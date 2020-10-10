@@ -4,7 +4,7 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 
-private const val LOG_TAG = "LOG_IT"
+private const val LOG_TAG = "INVIDEO_RENDERER"
 fun Activity.logIt(message: String) {
     Log.d(LOG_TAG, message)
 }

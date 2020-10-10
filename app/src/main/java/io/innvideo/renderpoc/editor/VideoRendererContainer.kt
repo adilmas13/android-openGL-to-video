@@ -10,8 +10,8 @@ import android.os.Handler
 import android.util.Log
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYER
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYERS
-import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
-import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.MainUiData
 import io.innvideo.renderpoc.editor.openGL.OpenGLCore
 import io.innvideo.renderpoc.editor.openGL.textures.ImageTexture
 import io.innvideo.renderpoc.editor.openGL.textures.TextTexture
@@ -36,7 +36,7 @@ class VideoRendererContainer(
             openGLCore.init()
             layers.addAll(uiData.layers)
             while (isRunning) {
-                Log.d("TEST", "RUNNING")
+                logIt("RUNNING")
                 renderOnScreen()
                 sleep(33)
             }

@@ -1,9 +1,9 @@
-package io.innvideo.renderpoc.editor.new_models.parsed_models
+package io.innvideo.renderpoc.editor.newModels.parsed_models
 
 import android.graphics.Bitmap
 import android.graphics.Typeface
 import android.os.Parcelable
-import io.innvideo.renderpoc.editor.new_models.response_models.PositionResponseModel
+import io.innvideo.renderpoc.editor.newModels.response_models.PositionResponseModel
 import kotlinx.android.parcel.Parcelize
 
 class MainUiData {

@@ -9,7 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYER
 import io.innvideo.renderpoc.editor.constants.EditorConstants.LAYERS
-import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.LayerData
 import io.innvideo.renderpoc.editor.openGL.OpenGLCore
 import io.innvideo.renderpoc.editor.openGL.textures.ImageTexture
 import io.innvideo.renderpoc.editor.openGL.textures.TextTexture

@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.editor.video_renderer
+package io.innvideo.renderpoc.editor.videoRenderer
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList

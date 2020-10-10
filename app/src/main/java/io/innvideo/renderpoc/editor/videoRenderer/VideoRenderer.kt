@@ -1,4 +1,4 @@
-package io.innvideo.renderpoc.editor.video_renderer
+package io.innvideo.renderpoc.editor.videoRenderer
 
 import android.content.Context
 import android.media.MediaCodec
@@ -23,7 +23,7 @@ import android.os.Environment
 import android.util.Log
 import io.innvideo.renderpoc.R
 import io.innvideo.renderpoc.editor.VideoRendererContainer
-import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.MainUiData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

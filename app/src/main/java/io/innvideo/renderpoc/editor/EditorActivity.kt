@@ -1,5 +1,6 @@
 package io.innvideo.renderpoc.editor
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -14,20 +15,19 @@ import coil.api.load
 import com.google.gson.Gson
 import io.innvideo.renderpoc.BuildConfig
 import io.innvideo.renderpoc.R
-import io.innvideo.renderpoc.editor.new_models.parsed_models.LayerData
-import io.innvideo.renderpoc.editor.new_models.parsed_models.MainUiData
-import io.innvideo.renderpoc.editor.new_models.response_models.ParentResponseModel
+import io.innvideo.renderpoc.editor.newModels.parsed_models.LayerData
+import io.innvideo.renderpoc.editor.newModels.parsed_models.MainUiData
+import io.innvideo.renderpoc.editor.newModels.response_models.ParentResponseModel
 import io.innvideo.renderpoc.editor.openGL.utils.GLSLTextReader.Companion.readGlslFromRawRes
 import io.innvideo.renderpoc.editor.parser.EditorDataParser
-import io.innvideo.renderpoc.editor.video_renderer.VideoRenderer
-import io.innvideo.renderpoc.editor.video_renderer.size
+import io.innvideo.renderpoc.editor.videoRenderer.VideoRenderer
+import io.innvideo.renderpoc.editor.videoRenderer.size
 import kotlinx.android.synthetic.main.activity_editor.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 
 class EditorActivity : AppCompatActivity() {
@@ -38,6 +38,7 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var renderedVideoFilePath: String
 
+    @SuppressLint("ClickableViewAccessibility")
     private var touchListener = View.OnTouchListener { v, event ->
         // Convert touch coordinates into normalized device
         // coordinates, keeping in mind that Android's Y
